@@ -44,6 +44,7 @@ def load_db():
 
 bot_cls = load()
 bot = bot_cls.get_bot()
+
 interface = ui_set()
 load_db()
 

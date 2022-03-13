@@ -1,8 +1,9 @@
+import handlers
 from loader import *
-from handlers import *
 
 if __name__ == '__main__':
 	try:
+		print(bot)
 		bot.polling()
 	except BaseException as er:
 		print(er)

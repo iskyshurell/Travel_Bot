@@ -1,4 +1,5 @@
-from my_bot.loader import bot, interface
+from my_bot.loader import *
+
 
 
 @bot.message_handler(commands = ['help'])
