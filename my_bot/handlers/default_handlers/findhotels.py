@@ -1,4 +1,4 @@
-from my_bot.loader import *
+from my_bot.loader import bot, interface
 import re
 from my_bot.rapidapi.get_hotels import get_city, get_hotel
 from my_bot.rapidapi.sort_api import sort
