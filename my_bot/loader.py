@@ -1,7 +1,7 @@
 import telebot
 import os
 from database import *
-from UI import UI
+from Interface.UI import *
 from dotenv import load_dotenv
 from keyboards.reply import *
 from keyboards.remove import *
