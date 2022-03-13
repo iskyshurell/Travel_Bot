@@ -1,4 +1,4 @@
-from my_bot.loader import bot
+from my_bot.loader import bot, interface
 
 
 

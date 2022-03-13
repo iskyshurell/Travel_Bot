@@ -1,5 +1,5 @@
 import handlers
-from loader import bot
+from my_bot.loader import bot
 
 if __name__ == '__main__':
 	try:
