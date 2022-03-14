@@ -10,7 +10,9 @@ class BaseModel(Model):
 
 
 class User(BaseModel):
-	name = CharField()
+	username = CharField()
+	first_name = CharField()
+	surname = CharField()
 	id = IntegerField()
 
 
@@ -31,32 +33,33 @@ class Photo(BaseModel):
 def user_inf(u_id):
 	with db:
 		result = User.select().where(User.id == u_id).get()
-		return result.name, result.hotels
+		return result
 
 
 def db_update(user_id, massive):
 	with db:
+
 		try:
 			user = User.select().where(User.id == user_id).get()
-			hotel = Hotel.create(requester = user, time = datetime.now(), name = massive[0], address = massive[1], dist = massive[2], price = massive[3])
+			hotel = Hotel.create(requester = user, time = datetime.now(), name = f'{massive[0]}', address = f'{massive[1]}', dist = f'{massive[2]}', price = f'{massive[3]}')
 			for i_ph in massive[4]:
 				Photo.create(hotel_ph = hotel, photo = i_ph)
 		except DoesNotExist:
 			print("No User")
 
 
-def create_user(name, u_id):
+def create_user(name, fname, sname, u_id):
 	with db:
-		User.create(name = name, id = u_id)
+		User.create(username = name, first_name = fname, surname = sname, id = u_id)
 
 
 if __name__ == '__main__':
-	pass
-	# with db:
-	# 	User.create_table()
-	# 	Hotel.create_table()
-	# 	Photo.create_table()
-	# create_user('isky', 1234)
+	with db:
+		User.create_table()
+		Hotel.create_table()
+		Photo.create_table()
+		create_user('isky', 'GG', 'GGh', 1234)
+		print(User.select().where(User.id == 1234).get().surname)
 	#
 	# db_update(1234, ('INgyl', 'dsgesg2', '1.2 km', '1200 RUB', 'gfgr'))
 

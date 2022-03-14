@@ -25,7 +25,7 @@ def get_photos(id):
     headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
                'x-rapidapi-key': "f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8"}
 
-    response = requests.request("GET", url, headers = headers, params = querystring)
+    response = requests.request("GET", url, headers = headers, params = querystring, timeout = 10)
     response = json.loads(response.text)
     all_ph = [re.sub(r"{size}", r"z", i['baseUrl']) for i in response.get('hotelImages')]
 
@@ -45,21 +45,18 @@ def get_massive(url, querystring, headers, pattern):
 
         response = requests.get(url, headers = headers, params = querystring, timeout = 10)
 
-        if response.status_code == requests.codes.ok:
-            pass
-        else:
-            raise BaseException
+        if not response.status_code == requests.codes.ok:
+            raise ConnectionError
 
         find = re.search(pattern, response.text)
 
-        if find:
-            pass
-        else:
-            raise BaseException
+        if not find:
+            raise ConnectionError
+
         text = json.loads(response.text)
 
         return text
-    except Exception as er:
+    except ConnectionError as er:
         print(er)
 
 
