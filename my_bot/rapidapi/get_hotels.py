@@ -1,4 +1,5 @@
 from typing import Dict, List, Any
+from config.load_data import api_key, api_key2
 import requests
 import json
 import re
@@ -23,7 +24,7 @@ def get_photos(id):
     querystring = {"id": id}
 
     headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
-               'x-rapidapi-key': "f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8"}
+               'x-rapidapi-key': api_key}
 
     response = requests.request("GET", url, headers = headers, params = querystring, timeout = 10)
     response = json.loads(response.text)
@@ -64,7 +65,7 @@ def get_city(city):
     url = "https://hotels4.p.rapidapi.com/locations/v2/search"
     querystring = {"query": city, "locale": "ru_RU", "currency": "USD"}
     headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
-               'x-rapidapi-key': "f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8"}
+               'x-rapidapi-key': api_key}
     pattern = r'(?<="CITY_GROUP",).+?(?=},)'
 
     temp = get_massive(url, querystring, headers, pattern)
@@ -85,7 +86,7 @@ def get_hotel(city_id):
     querystring = {"destinationId": city_id, "pageNumber": "1", "pageSize": "25", "checkIn": "2020-01-08",
                    "checkOut": "2020-01-15", "adults1": "1", "sortOrder": "PRICE", "locale": "ru_RU", "currency": "RUB"}
     headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
-               'x-rapidapi-key': "f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8"}  # '39b50a7edamsh1bb6fd79c247c85p1d94f7jsn25fe3660cab3'
+               'x-rapidapi-key': api_key}
     pattern = r'(?<=,)"results":.+?(?=,"pagination")'
 
     temp = get_massive(url, querystring, headers, pattern)

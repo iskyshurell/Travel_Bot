@@ -2,15 +2,12 @@ import telebot
 import os
 from database import *
 from Interface.UI import *
-from dotenv import load_dotenv
 from keyboards.reply import *
 from keyboards.remove import *
+from config.load_data import token
 
 
-def load():
-
-	load_dotenv('token.env')
-	token = os.getenv('token')
+def load(token):
 
 	bot = telebot.TeleBot(token)
 	return bot
@@ -31,7 +28,7 @@ add_remove_keyboard(ui, 'del')
 add_reply_keyboard(ui, 2, '/lowprice', '/highprice', '/bestdeal', '/history', board = 'mar')
 interface = ui
 
-bot = load()
+bot = load(token)
 load_db()
 
 
