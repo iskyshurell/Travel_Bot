@@ -5,17 +5,19 @@ import json
 import re
 
 
-def getter(massive: Dict, args: List[str or int]) -> Any:
-    if isinstance(massive, dict):
+def get_massive(url, querystring, headers, pattern):
+    try:
 
-        if len(args) > 1:
-            return getter(massive.get(args[0]), args[1:])
+        response = requests.get(url, headers = headers, params = querystring, timeout = 10)
 
-        return massive.get(args[0])
+        if response.status_code == requests.codes.ok:
+            find = re.search(pattern, response.text)
+            if find:
+                return json.loads(response.text)
+        raise ConnectionError
 
-    elif isinstance(massive, list):
-        return getter(massive[args[0]], args[1:])
-    return "Error not found"
+    except ConnectionError as er:
+        print(er)
 
 
 def get_photos(id):
@@ -35,30 +37,23 @@ def get_photos(id):
     return all_ph[:2]
 
 
+def getter(massive: Dict, args: List[str or int]) -> Any:
+    if isinstance(massive, dict):
+
+        if len(args) > 1:
+            return getter(massive.get(args[0]), args[1:])
+
+        return massive.get(args[0])
+
+    elif isinstance(massive, list):
+        return getter(massive[args[0]], args[1:])
+    return "Error not found"
+
+
 def get_hotels(data):
     return [(getter(i, ['name']), getter(i, ['address', 'streetAddress']), getter(i, ['landmarks', 0, 'distance']),
              getter(i, ['ratePlan', 'price', 'current']), get_photos(getter(i, ['id']))) for i in
             data['data']['body']['searchResults']["results"]]
-
-
-def get_massive(url, querystring, headers, pattern):
-    try:
-
-        response = requests.get(url, headers = headers, params = querystring, timeout = 10)
-
-        if not response.status_code == requests.codes.ok:
-            raise ConnectionError
-
-        find = re.search(pattern, response.text)
-
-        if not find:
-            raise ConnectionError
-
-        text = json.loads(response.text)
-
-        return text
-    except ConnectionError as er:
-        print(er)
 
 
 def get_city(city):
@@ -70,6 +65,10 @@ def get_city(city):
 
     temp = get_massive(url, querystring, headers, pattern)
 
+    return choose_city(temp)
+
+
+def choose_city(temp):
     pattern = r"\W|[q,w,e,r,t,y,u,i,o,p,a,s,d,f,g,h,j,k,l,z,x,c,v,b,n,m]"
     sec_pattern = r"\s{2,}"
     city = dict()
