@@ -1,11 +1,11 @@
 import time
 
-from my_bot.loader import bot, interface
+from loader import bot, interface
 import re
-from my_bot.database import *
-from my_bot.rapidapi.get_hotels import get_city, get_hotel
-from my_bot.rapidapi.sort_api import sort
-from my_bot.keyboards import inline
+from database import *
+from rapidapi.get_hotels import get_city, get_hotel
+from rapidapi.sort_api import sort
+from keyboards import inline
 
 
 @bot.message_handler(commands = ['find-hotels', 'lowprice', 'highprice', 'bestdeal', 'history'])

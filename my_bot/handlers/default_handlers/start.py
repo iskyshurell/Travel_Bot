@@ -1,4 +1,4 @@
-from my_bot.loader import bot, interface
+from loader import bot, interface
 
 
 @bot.message_handler(content_types = 'text')
