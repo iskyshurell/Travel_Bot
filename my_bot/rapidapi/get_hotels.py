@@ -18,6 +18,11 @@ def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
 
     except ConnectionError as er:
         print(er)
+        if headers['x-rapidapi-key'] != api_key2:
+            headers['x-rapidapi-key'] = api_key2
+            get_massive(url, querystring, headers, pattern)
+        else:
+            print('Не удалось выполнить запрос')
 
 
 def get_photos(id):
@@ -82,3 +87,6 @@ def get_hotel(city_id):
                        pattern = r'(?<=,)"results":.+?(?=,"pagination")')
 
     return get_hotels(temp)
+
+if __name__ == '__main__':
+    print(get_city('Николаев'))
