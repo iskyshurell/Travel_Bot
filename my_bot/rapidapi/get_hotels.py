@@ -5,7 +5,7 @@ import json
 import re
 
 
-def get_massive(url, querystring, headers, pattern):
+def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
     try:
 
         response = requests.get(url, headers = headers, params = querystring, timeout = 10)
@@ -21,15 +21,10 @@ def get_massive(url, querystring, headers, pattern):
 
 
 def get_photos(id):
-    url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos"
+    response = get_massive(url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos",
+                           querystring = {"id": id},
+                           headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com", 'x-rapidapi-key': api_key})
 
-    querystring = {"id": id}
-
-    headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
-               'x-rapidapi-key': api_key}
-
-    response = requests.request("GET", url, headers = headers, params = querystring, timeout = 10)
-    response = json.loads(response.text)
     all_ph = [re.sub(r"{size}", r"z", i['baseUrl']) for i in response.get('hotelImages')]
 
     if len(all_ph) < 2:
@@ -57,13 +52,11 @@ def get_hotels(data):
 
 
 def get_city(city):
-    url = "https://hotels4.p.rapidapi.com/locations/v2/search"
-    querystring = {"query": city, "locale": "ru_RU", "currency": "USD"}
-    headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
-               'x-rapidapi-key': api_key}
-    pattern = r'(?<="CITY_GROUP",).+?(?=},)'
-
-    temp = get_massive(url, querystring, headers, pattern)
+    temp = get_massive(url= "https://hotels4.p.rapidapi.com/locations/v2/search",
+                       querystring = {"query": city, "locale": "ru_RU", "currency": "USD"},
+                       headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
+                                  'x-rapidapi-key': api_key},
+                       pattern = r'(?<="CITY_GROUP",).+?(?=},)')
 
     return choose_city(temp)
 
@@ -81,13 +74,11 @@ def choose_city(temp):
 
 
 def get_hotel(city_id):
-    url = "https://hotels4.p.rapidapi.com/properties/list"
-    querystring = {"destinationId": city_id, "pageNumber": "1", "pageSize": "25", "checkIn": "2020-01-08",
-                   "checkOut": "2020-01-15", "adults1": "1", "sortOrder": "PRICE", "locale": "ru_RU", "currency": "RUB"}
-    headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
-               'x-rapidapi-key': api_key}
-    pattern = r'(?<=,)"results":.+?(?=,"pagination")'
-
-    temp = get_massive(url, querystring, headers, pattern)
+    temp = get_massive(url = "https://hotels4.p.rapidapi.com/properties/list",
+                       querystring = {"destinationId": city_id, "pageNumber": "1", "pageSize": "25",
+                                      "checkIn": "2020-01-08", "checkOut": "2020-01-15", "adults1": "1",
+                                      "sortOrder": "PRICE", "locale": "ru_RU", "currency": "RUB"},
+                       headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com", 'x-rapidapi-key': api_key},
+                       pattern = r'(?<=,)"results":.+?(?=,"pagination")')
 
     return get_hotels(temp)

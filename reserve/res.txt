@@ -1,0 +1,25 @@
+
+#Для фото
+
+url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos"
+
+    querystring = {"id": id}
+
+    headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
+               'x-rapidapi-key': api_key}
+
+#Для города
+
+url = "https://hotels4.p.rapidapi.com/locations/v2/search"
+    querystring = {"query": city, "locale": "ru_RU", "currency": "USD"}
+    headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
+               'x-rapidapi-key': api_key}
+    pattern = r'(?<="CITY_GROUP",).+?(?=},)'
+
+
+#url = "https://hotels4.p.rapidapi.com/properties/list"
+    querystring = {"destinationId": city_id, "pageNumber": "1", "pageSize": "25", "checkIn": "2020-01-08",
+                   "checkOut": "2020-01-15", "adults1": "1", "sortOrder": "PRICE", "locale": "ru_RU", "currency": "RUB"}
+    headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
+               'x-rapidapi-key': api_key}
+    pattern = r'(?<=,)"results":.+?(?=,"pagination")'
