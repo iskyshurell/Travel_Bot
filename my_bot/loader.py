@@ -1,5 +1,4 @@
 import telebot
-import os
 from database import *
 from Interface.UI import *
 from keyboards.reply import *
@@ -7,13 +6,13 @@ from keyboards.remove import *
 from config.load_data import token
 
 
-def load(token):
+def load(token: str) -> telebot.TeleBot:
 
 	bot = telebot.TeleBot(token)
 	return bot
 
 
-def load_db():
+def load_db() -> None:
 	with db:
 		User.create_table()
 		Hotel.create_table()
