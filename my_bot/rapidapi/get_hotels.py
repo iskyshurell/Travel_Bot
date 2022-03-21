@@ -5,7 +5,7 @@ import json
 import re
 
 
-def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
+def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = '') -> Dict:
     try:
 
         response = requests.get(url, headers = headers, params = querystring, timeout = 10)
@@ -25,7 +25,7 @@ def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
             print('Не удалось выполнить запрос')
 
 
-def get_photos(id):
+def get_photos(id: str) -> List:
     response = get_massive(url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos",
                            querystring = {"id": id},
                            headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com", 'x-rapidapi-key': api_key})

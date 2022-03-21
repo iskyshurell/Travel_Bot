@@ -1,8 +1,8 @@
 import re
-from typing import Any, Iterable
+from typing import Union, Iterable
 
 
-def key(x_1: Any[int, float], pattern: str, pattern2: str = '', skip: int = 1):
+def key(x_1: Union[int, str], pattern: str, pattern2: str = '', skip: int = 1) -> Union[int, str]:
     if float(skip) == 0:
         return skip
     elif x_1 != 'Error not found':
@@ -24,12 +24,12 @@ def sort_hp(example: Iterable) -> Iterable:
     return sorted(example, key = lambda x: int(key(x[3], r'[RUB, ]')), reverse = True)
 
 
-def sort_bd(example: Iterable, filt: int, dist: Any[int, float]) -> Iterable:
+def sort_bd(example: Iterable, filt: int, dist: Union[int, float]) -> Iterable:
     obj = filter(lambda x: int(key(x[3], r'[RUB, ]', skip = filt)) <= filt and key(x[3], r'[RUB, ]', skip = filt) != -1 and float(key(key(x[2], r'[,]', '.'), r'[км ]', skip = int(dist))) <= dist, example)
     return [i for i in obj]
 
 
-def sort(example: Iterable, func: str, filt: int = 0, dist: Any[int, float] = 0):
+def sort(example: Iterable, func: str, filt: int = 0, dist: Union[int, float] = 0) -> Iterable:
     try:
         if func == 'lowprice':
 
