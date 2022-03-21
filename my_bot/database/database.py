@@ -1,5 +1,6 @@
 from datetime import datetime
 from peewee import *
+from typing import List
 
 db = SqliteDatabase('BDB')  # 'Bot Data Base'
 
@@ -30,13 +31,13 @@ class Photo(BaseModel):
 	photo = CharField()
 
 
-def user_inf(u_id):
+def user_inf(u_id: int) -> User:
 	with db:
 		result = User.select().where(User.id == u_id).get()
 		return result
 
 
-def db_update(user_id, massive):
+def db_update(user_id: int, massive: List) -> None:
 	with db:
 
 		try:
@@ -48,7 +49,7 @@ def db_update(user_id, massive):
 			print("No User")
 
 
-def create_user(name, fname, sname, u_id):
+def create_user(name: str, fname: str, sname: str, u_id: int) -> None:
 	with db:
 		User.create(username = name, first_name = fname, surname = sname, id = u_id)
 
