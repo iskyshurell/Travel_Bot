@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Tuple, Iterable, Union
 from config.load_data import api_key, api_key2
 import requests
 import json
@@ -37,7 +37,7 @@ def get_photos(id: str) -> List:
     return all_ph[:2]
 
 
-def getter(massive: Dict, args: List[str or int]) -> Any:
+def getter(massive: Dict, args: List[str or int]) -> Union[str, Iterable]:
     if isinstance(massive, dict):
 
         if len(args) > 1:
@@ -50,13 +50,13 @@ def getter(massive: Dict, args: List[str or int]) -> Any:
     return "Error not found"
 
 
-def get_hotels(data):
+def get_hotels(data: Union[List, Tuple, Dict]) -> List:
     return [(getter(i, ['name']), getter(i, ['address', 'streetAddress']), getter(i, ['landmarks', 0, 'distance']),
              getter(i, ['ratePlan', 'price', 'current']), get_photos(getter(i, ['id']))) for i in
             data['data']['body']['searchResults']["results"]]
 
 
-def get_city(city):
+def get_city(city: str) -> Dict:
     temp = get_massive(url= "https://hotels4.p.rapidapi.com/locations/v2/search",
                        querystring = {"query": city, "locale": "ru_RU", "currency": "USD"},
                        headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
@@ -66,7 +66,7 @@ def get_city(city):
     return choose_city(temp)
 
 
-def choose_city(temp):
+def choose_city(temp: Dict) -> Dict:
     pattern = r"\W|[q,w,e,r,t,y,u,i,o,p,a,s,d,f,g,h,j,k,l,z,x,c,v,b,n,m]"
     sec_pattern = r"\s{2,}"
     city = dict()
@@ -78,7 +78,7 @@ def choose_city(temp):
     return city
 
 
-def get_hotel(city_id):
+def get_hotel(city_id: str) -> List:
     temp = get_massive(url = "https://hotels4.p.rapidapi.com/properties/list",
                        querystring = {"destinationId": city_id, "pageNumber": "1", "pageSize": "25",
                                       "checkIn": "2020-01-08", "checkOut": "2020-01-15", "adults1": "1",
@@ -87,6 +87,7 @@ def get_hotel(city_id):
                        pattern = r'(?<=,)"results":.+?(?=,"pagination")')
 
     return get_hotels(temp)
+
 
 if __name__ == '__main__':
     print(get_city('Николаев'))
