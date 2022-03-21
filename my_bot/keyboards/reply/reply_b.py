@@ -1,7 +1,8 @@
 from telebot import types
+from interface.UI import UI
 
 
-def add_reply_keyboard(ui, k: int, *args, **kwargs):
+def add_reply_keyboard(ui: UI, k: int, *args, **kwargs) -> None:
 	keyboard = types.ReplyKeyboardMarkup()
 	buttons = [types.KeyboardButton(i_btn) for i_btn in args]
 	for i in range(0, 9, k):

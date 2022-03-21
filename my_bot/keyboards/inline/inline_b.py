@@ -1,7 +1,8 @@
 from telebot import types
+from typing import Dict
 
 
-def add_inline_keyboard(iter_k, func):
+def add_inline_keyboard(iter_k: Dict, func: str) -> types.InlineKeyboardMarkup:
 	inline_keyboard = types.InlineKeyboardMarkup()
 
 	for i_key, i_val in iter_k.items():
