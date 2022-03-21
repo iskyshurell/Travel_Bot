@@ -1,7 +1,8 @@
 import re
+from typing import Any, Iterable
 
 
-def key(x_1, pattern, pattern2 = '', skip = 1):
+def key(x_1: Any[int, float], pattern: str, pattern2: str = '', skip: int = 1):
     if float(skip) == 0:
         return skip
     elif x_1 != 'Error not found':
@@ -12,20 +13,33 @@ def key(x_1, pattern, pattern2 = '', skip = 1):
         return -1
 
 
-def sort(example, func: str, filt: int = 0, dist: float = 0):
+def sort_lp(example: Iterable) -> Iterable:
+    temp = [i for i in example if i[3] != 'Error not found']
+    temp = sorted(temp, key = lambda x: int(key(x[3], r'[RUB, ]')))
+    temp.extend([i for i in filter(lambda x: x[3] == "Error not found", example)])
+    return temp
+
+
+def sort_hp(example: Iterable) -> Iterable:
+    return sorted(example, key = lambda x: int(key(x[3], r'[RUB, ]')), reverse = True)
+
+
+def sort_bd(example: Iterable, filt: int, dist: Any[int, float]) -> Iterable:
+    obj = filter(lambda x: int(key(x[3], r'[RUB, ]', skip = filt)) <= filt and key(x[3], r'[RUB, ]', skip = filt) != -1 and float(key(key(x[2], r'[,]', '.'), r'[км ]', skip = int(dist))) <= dist, example)
+    return [i for i in obj]
+
+
+def sort(example: Iterable, func: str, filt: int = 0, dist: Any[int, float] = 0):
     try:
         if func == 'lowprice':
-            temp = [i for i in example if i[3] != 'Error not found']
-            temp = sorted(temp, key = lambda x: int(key(x[3], r'[RUB, ]')))
-            temp.extend([i for i in filter(lambda x: x[3] == "Error not found", example)])
 
-            return temp
+            return sort_lp(example)
         elif func == 'highprice':
 
-            return sorted(example, key = lambda x: int(key(x[3], r'[RUB, ]')), reverse = True)
+            return sort_hp(example)
         elif func == 'bestdeal':
-            obj = filter(lambda x: int(key(x[3], r'[RUB, ]', skip = filt)) <= filt and key(x[3], r'[RUB, ]', skip = filt) != -1 and float(key(key(x[2], r'[,]', '.'), r'[км ]', skip = int(dist))) <= dist, example)
-            return [i for i in obj]
+
+            return sort_bd(example, filt, dist)
         else:
             raise SyntaxError
     except BaseException as er:
