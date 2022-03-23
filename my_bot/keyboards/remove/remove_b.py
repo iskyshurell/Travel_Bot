@@ -1,5 +1,5 @@
 from telebot import types
-from interface.UI import UI
+from Interface.UI import UI
 
 
 def add_remove_keyboard(ui: UI, board: str = '') -> None:

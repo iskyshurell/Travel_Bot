@@ -1,5 +1,5 @@
 from telebot import types
-from interface.UI import UI
+from Interface.UI import UI
 
 
 def add_reply_keyboard(ui: UI, k: int, *args, **kwargs) -> None:
