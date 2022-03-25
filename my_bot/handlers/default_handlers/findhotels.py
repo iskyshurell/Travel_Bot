@@ -5,6 +5,8 @@ from database import *
 from rapidapi.get_hotels import get_city, get_hotel
 from rapidapi.sort_api import sort
 from keyboards import inline
+from telegram_bot_calendar import LSTEP, DetailedTelegramCalendar
+from textblob import TextBlob
 
 
 @bot.message_handler(commands = ['find-hotels', 'lowprice', 'highprice', 'bestdeal', 'history'])
@@ -86,21 +88,39 @@ def get_cities(message, func1: str) -> None:
 
 @bot.callback_query_handler(func = lambda call: re.search(r'\d+', call.data))
 def n_input(message) -> None:
-	bot.delete_message(chat_id = message.from_user.id, message_id = message.message.message_id)
-	bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
-	                 reply_markup = interface.get_ui('del'))
-
 	info = str(message.data)
 	info = info.split('-')
 	city, func = info[0], info[1]
 
-	if func != 'bestdeal':
-		bot.register_next_step_handler(message.message, final_result, func, city)
-	else:
-		bot.register_next_step_handler(message.message, optional_func, func, city)
+	bot.edit_message_text(f'Вы выбрали: {city}', chat_id = message.from_user.id, message_id = message.message.message_id)
+	bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
+	                 reply_markup = interface.get_ui('del'))
 
 
-def optional_func(message, func1: str, city: str):
+	bot.register_next_step_handler(message.message, dates, func, city)
+	# if func != 'bestdeal':
+	# 	bot.register_next_step_handler(message.message, final_result, func, city)
+	# else:
+	# 	bot.register_next_step_handler(message.message, optional_func, func, city)
+
+
+def dates(message, func: str, city: str) -> None:
+	cal, step = DetailedTelegramCalendar().build()
+	bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}')
+
+
+@bot.callback_query_handler(func = DetailedTelegramCalendar.func())
+def cal(message) -> None:
+	print(message)
+	result, key, step = DetailedTelegramCalendar().process(message.data)
+
+	if not result:
+		bot.edit_message_text(f"Select {TextBlob(LSTEP[step]).translate(to = 'ru')}", message.message.chat.id, message.message.message_id, reply_markup = key)
+	elif result:
+		bot.edit_message_text(f'Вы выбрали {result}', message.message.chat.id, message.message.message_id)
+
+
+def optional_func(message, func1: str, city: str) -> None:
 	result = re.search(r'[ \D]', message.text)
 	if not result:
 		n = int(message.text)
@@ -124,6 +144,7 @@ def optional_dist(message, func1, city, n):
 		bot.send_message(message.from_user.id, 'Вы ввели неправильную максимальную стоимость!')
 		bot.send_message(message.from_user.id, 'Введите новую стоимость:')
 		bot.register_next_step_handler(message, optional_dist, func1, city, n)
+
 
 
 def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist: float = 0.0,

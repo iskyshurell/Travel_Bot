@@ -9,15 +9,18 @@ def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = '') -
     try:
 
         response = requests.get(url, headers = headers, params = querystring, timeout = 10)
+        print(headers['x-rapidapi-key'])
 
         if response.status_code == requests.codes.ok:
+            print(response.text)
             find = re.search(pattern, response.text)
+            print(f'{find} - find')
             if find:
                 return json.loads(response.text)
+
         raise ConnectionError
 
     except ConnectionError as er:
-        print(er)
         if headers['x-rapidapi-key'] != api_key2:
             headers['x-rapidapi-key'] = api_key2
             get_massive(url, querystring, headers, pattern)
@@ -62,7 +65,6 @@ def get_city(city: str) -> Dict:
                        headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
                                   'x-rapidapi-key': api_key},
                        pattern = r'(?<="CITY_GROUP",).+?(?=},)')
-
     return choose_city(temp)
 
 
