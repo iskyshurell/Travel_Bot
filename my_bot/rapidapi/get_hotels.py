@@ -58,7 +58,6 @@ def get_city(city: str) -> Dict:
                          headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
                                   'x-rapidapi-key': api_key},
                          pattern = r'(?<="CITY_GROUP",).+?(?=},)')
-    print(result)
     return choose_city(result)
 
 

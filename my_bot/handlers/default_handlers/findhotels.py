@@ -88,11 +88,12 @@ def get_cities(message, func1: str) -> None:
 
 @bot.callback_query_handler(func = lambda call: re.search(r'\d+', call.data))
 def n_input(message) -> None:
+	print(message)
 	info = str(message.data)
 	info = info.split('-')
 	city, func = info[0], info[1]
 
-	bot.edit_message_text(f'Вы выбрали: {city}', chat_id = message.from_user.id, message_id = message.message.message_id)
+	bot.edit_message_text(f'Вы выбрали: ', chat_id = message.from_user.id, message_id = message.message.message_id)
 	bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
 	                 reply_markup = interface.get_ui('del'))
 
