@@ -1,26 +1,23 @@
 from typing import Dict, List, Tuple, Iterable, Union
-from config.load_data import api_key, api_key2
+from my_bot.config.load_data import api_key, api_key2
 import requests
 import json
 import re
 
+# api_key = 'f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8'
+# api_key2 = '39b50a7edamsh1bb6fd79c247c85p1d94f7jsn25fe3660cab3'
 
-def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = '') -> Dict:
+def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
     try:
-
-        response = requests.get(url, headers = headers, params = querystring, timeout = 10)
-        print(headers['x-rapidapi-key'])
+        response = requests.get(url, headers = headers, params = querystring)
 
         if response.status_code == requests.codes.ok:
-            print(response.text)
             find = re.search(pattern, response.text)
-            print(f'{find} - find')
             if find:
                 return json.loads(response.text)
-
+            
         raise ConnectionError
-
-    except ConnectionError as er:
+    except ConnectionError:
         if headers['x-rapidapi-key'] != api_key2:
             headers['x-rapidapi-key'] = api_key2
             get_massive(url, querystring, headers, pattern)
@@ -60,12 +57,13 @@ def get_hotels(data: Union[List, Tuple, Dict]) -> List:
 
 
 def get_city(city: str) -> Dict:
-    temp = get_massive(url= "https://hotels4.p.rapidapi.com/locations/v2/search",
-                       querystring = {"query": city, "locale": "ru_RU", "currency": "USD"},
-                       headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
+    result = get_massive(url= "https://hotels4.p.rapidapi.com/locations/v2/search",
+                         querystring = {"query": city, "locale": "ru_RU", "currency": "USD"},
+                         headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
                                   'x-rapidapi-key': api_key},
-                       pattern = r'(?<="CITY_GROUP",).+?(?=},)')
-    return choose_city(temp)
+                         pattern = r'(?<="CITY_GROUP",).+?(?=},)')
+    print(result)
+    return choose_city(result)
 
 
 def choose_city(temp: Dict) -> Dict:
@@ -92,4 +90,8 @@ def get_hotel(city_id: str) -> List:
 
 
 if __name__ == '__main__':
-    print(get_city('Николаев'))
+    print(get_massive(url= "https://hotels4.p.rapidapi.com/locations/v2/search",
+                         querystring = {"query":'Николаев', "locale": "ru_RU", "currency": "USD"},
+                         headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com",
+                                  'x-rapidapi-key': api_key},
+                         pattern = r'(?<="CITY_GROUP",).+?(?=},)'))
