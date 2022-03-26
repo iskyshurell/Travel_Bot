@@ -1,26 +1,22 @@
 from typing import Dict, List, Tuple, Iterable, Union
-from my_bot.config.load_data import api_key, api_key2
+from config.load_data import api_key, api_key2
 import requests
 import json
 import re
 
-# api_key = 'f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8'
-# api_key2 = '39b50a7edamsh1bb6fd79c247c85p1d94f7jsn25fe3660cab3'
 
 def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
     try:
         response = requests.get(url, headers = headers, params = querystring)
 
-        if response.status_code == requests.codes.ok:
-            find = re.search(pattern, response.text)
-            if find:
-                return json.loads(response.text)
+        if response.status_code == requests.codes.ok and re.search(pattern, response.text):
+            return json.loads(response.text)
             
         raise ConnectionError
-    except ConnectionError:
+    except ConnectionError as er:
         if headers['x-rapidapi-key'] != api_key2:
             headers['x-rapidapi-key'] = api_key2
-            get_massive(url, querystring, headers, pattern)
+            return get_massive(url, querystring, headers, pattern)
         else:
             print('Не удалось выполнить запрос')
 
