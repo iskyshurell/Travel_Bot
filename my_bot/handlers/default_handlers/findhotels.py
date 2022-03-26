@@ -86,39 +86,38 @@ def get_cities(message, func1: str) -> None:
 		bot.register_next_step_handler(message, get_cities, func1)
 
 
-@bot.callback_query_handler(func = lambda call: re.search(r'\d+', call.data))
+@bot.callback_query_handler(func = lambda call: re.search(r'/', call.data))
 def n_input(message) -> None:
-	print(message)
+	print(message.data)
 	info = str(message.data)
 	info = info.split('-')
-	city, func = info[0], info[1]
+	city, func, name = info[0], info[1], info[2]
 
-	bot.edit_message_text(f'Вы выбрали: ', chat_id = message.from_user.id, message_id = message.message.message_id)
+	bot.edit_message_text(f'Вы выбрали: {name}', chat_id = message.from_user.id, message_id = message.message.message_id)
 	bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
 	                 reply_markup = interface.get_ui('del'))
 
-
-	bot.register_next_step_handler(message.message, dates, func, city)
-	# if func != 'bestdeal':
-	# 	bot.register_next_step_handler(message.message, final_result, func, city)
-	# else:
-	# 	bot.register_next_step_handler(message.message, optional_func, func, city)
-
-
-def dates(message, func: str, city: str) -> None:
-	cal, step = DetailedTelegramCalendar().build()
-	bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}')
+	# bot.register_next_step_handler(message.message, dates, func, city)
+	if func != 'bestdeal':
+		bot.register_next_step_handler(message.message, final_result, func, city)
+	else:
+		bot.register_next_step_handler(message.message, optional_func, func, city)
 
 
-@bot.callback_query_handler(func = DetailedTelegramCalendar.func())
-def cal(message) -> None:
-	print(message)
-	result, key, step = DetailedTelegramCalendar().process(message.data)
-
-	if not result:
-		bot.edit_message_text(f"Select {TextBlob(LSTEP[step]).translate(to = 'ru')}", message.message.chat.id, message.message.message_id, reply_markup = key)
-	elif result:
-		bot.edit_message_text(f'Вы выбрали {result}', message.message.chat.id, message.message.message_id)
+# def dates(message, func: str, city: str) -> None:
+# 	call, step = DetailedTelegramCalendar().build()
+# 	bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}', reply_markup = call)
+#
+#
+# @bot.callback_query_handler(func = DetailedTelegramCalendar.func())
+# def cal(message) -> None:
+# 	print(message)
+# 	result, key, step = DetailedTelegramCalendar().process(message.data)
+#
+# 	if not result:
+# 		bot.edit_message_text(f"Выберите {TextBlob(LSTEP[step]).translate(to = 'ru')}", message.message.chat.id, message.message.message_id, reply_markup = key)
+# 	elif result:
+# 		bot.edit_message_text(f'Вы выбрали {result}', message.message.chat.id, message.message.message_id)
 
 
 def optional_func(message, func1: str, city: str) -> None:

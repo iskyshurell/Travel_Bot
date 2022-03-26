@@ -17,9 +17,19 @@ class User(BaseModel):
 	id = IntegerField()
 
 
+class Request(BaseModel):
+	user = ForeignKeyField(User, related_name = 'requests')
+	time = DateTimeField()
+	func = CharField()
+	dist = FloatField()
+	m_price = IntegerField()
+	n_hotels = IntegerField()
+	s_date = DateTimeField()
+	f_date = DateTimeField()
+
+
 class Hotel(BaseModel):
 	requester = ForeignKeyField(User, related_name = 'hotels')
-	time = DateTimeField()
 	name = CharField()
 	address = CharField()
 	dist = CharField()
@@ -48,6 +58,7 @@ def db_update(user_id: int, massive: List) -> None:
 		except DoesNotExist:
 			print("No User")
 
+def request_update()
 
 def create_user(name: str, fname: str, sname: str, u_id: int) -> None:
 	with db:
