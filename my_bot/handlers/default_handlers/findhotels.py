@@ -35,24 +35,25 @@ def func_choose(message, flag: bool = False, func: str = '') -> None:
 				raise ValueError
 
 			if func == 'history':
-				with db:
-					user = message.from_user
-
-					try:
-						if User.select().where(User.id == user.id and User.username == user.username):
-							temp_info = user_inf(user.id)
-
-							for i_h in temp_info.hotels:
-								time.sleep(1)
-								bot.send_message(user.id, f'Время запроса: {i_h.time}\nИмя отеля: {i_h.name}\nАдресс отеля: {i_h.address}\nДистанция до центра города: {i_h.dist}\nСтомость проживания в отеле: {i_h.price}')
-								for i_p in i_h.photos:
-									bot.send_message(user.id, f'{i_p.photo}')
-							bot.send_message(user.id, f'Отлично! Операция прошла успешно\nВот все запросы сделанные из аккаунта {temp_info.first_name}, {temp_info.surname}', reply_markup = interface.get_ui('next'))
-							bot.register_next_step_handler(message, next_h)
-
-					except (DoesNotExist, OperationalError):
-						bot.send_message(user.id, 'Похоже вы ещё не делали запросов(', reply_markup = interface.get_ui('next'))
-						bot.register_next_step_handler(message, next_h)
+				pass
+				# with db:
+				# 	user = message.from_user
+				#
+				# 	try:
+				# 		if User.select().where(User.id == user.id and User.username == user.username):
+				# 			temp_info = user_inf(user.id)
+				#
+				# 			for i_h in temp_info.hotels:
+				# 				time.sleep(1)
+				# 				bot.send_message(user.id, f'Время запроса: {i_h.time}\nИмя отеля: {i_h.name}\nАдресс отеля: {i_h.address}\nДистанция до центра города: {i_h.dist}\nСтомость проживания в отеле: {i_h.price}')
+				# 				for i_p in i_h.photos:
+				# 					bot.send_message(user.id, f'{i_p.photo}')
+				# 			bot.send_message(user.id, f'Отлично! Операция прошла успешно\nВот все запросы сделанные из аккаунта {temp_info.first_name}, {temp_info.surname}', reply_markup = interface.get_ui('next'))
+				# 			bot.register_next_step_handler(message, next_h)
+				#
+				# 	except (DoesNotExist, OperationalError):
+				# 		bot.send_message(user.id, 'Похоже вы ещё не делали запросов(', reply_markup = interface.get_ui('next'))
+				# 		bot.register_next_step_handler(message, next_h)
 
 			else:
 
@@ -178,19 +179,19 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 				for i_ph in temp[-1]:
 					bot.send_message(message.from_user.id, i_ph)
 
-			with db:
-				user = message.from_user
-				try:
-					obj = User.select().where(User.id == user.id and User.username == user.username).get()
-
-				except (DoesNotExist, OperationalError):
-					create_user(name = user.username, fname = user.first_name, sname = user.last_name, u_id = user.id)
-
-				finally:
-					u_id = user.id
-					for i in range(min(n, len(hotels))):
-						temp = hotels[i]
-						db_update(u_id, temp)
+			# with db:
+			# 	user = message.from_user
+			# 	try:
+			# 		obj = User.select().where(User.id == user.id and User.username == user.username).get()
+			#
+			# 	except (DoesNotExist, OperationalError):
+			# 		create_user(name = user.username, fname = user.first_name, sname = user.last_name, u_id = user.id)
+			#
+			# 	finally:
+			# 		u_id = user.id
+			# 		for i in range(min(n, len(hotels))):
+			# 			temp = hotels[i]
+			# 			db_update(u_id, temp)
 			bot.register_next_step_handler(message, next_h)
 
 	except TypeError as er:
