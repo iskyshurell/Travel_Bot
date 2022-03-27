@@ -90,6 +90,12 @@ def all_info(u_id: int) -> Hotel:
 				yield i_h
 
 
+def get_last_req(u_id: int):
+	with db:
+		user = User.select().where(User.id == u_id).get()
+		return user.requests[-1]
+
+
 if __name__ == '__main__':
 	with db:
 		User.create_table()
@@ -98,7 +104,8 @@ if __name__ == '__main__':
 		Photo.create_table()
 
 		# create_user('gg', 'wp', 'we', 1234)
-		# request_update(1234, 000)
+		# request_update(1234, 2)
+		print(get_last_req(1234))
 	# 	print(request_info(000, 1234))
 	# 	db_update(000, ('Отель «Ингул»', 'ул. Адмиральская, 34', '3,8 км', '1,570 RUB',
 	#             ['https://exp.cdn-hotels.com/hotels/28000000/27320000/27317800/27317796/481e0d06_z.jpg',

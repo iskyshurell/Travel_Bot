@@ -98,18 +98,34 @@ def n_input(message) -> None:
 	bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
 	                 reply_markup = interface.get_ui('del'))
 
-	# bot.register_next_step_handler(message.message, dates, func, city)
-	if func != 'bestdeal':
-		bot.register_next_step_handler(message.message, final_result, func, city)
+	bot.register_next_step_handler(message.message, dates, func, city)
+	# if func != 'bestdeal':
+	# 	bot.register_next_step_handler(message.message, final_result, func, city)
+	# else:
+	# 	bot.register_next_step_handler(message.message, optional_func, func, city)
+
+
+def dates(message, func: str, city: str) -> None:
+	result = re.search(r'[ \D]', message.text)
+	if not result:
+		with db:
+			user = message.from_user
+			try:
+				obj = User.select().where(User.id == user.id and User.username == user.username).get()
+
+			except (DoesNotExist, OperationalError):
+				create_user(name = user.username, fname = user.first_name, sname = user.last_name, u_id = user.id)
+
+			finally:
+				request_update(user.id, message.message.message_id, func = func, n_hotels = int(message.text))
+
+		call, step = DetailedTelegramCalendar().build()
+		bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}', reply_markup = call)
 	else:
-		bot.register_next_step_handler(message.message, optional_func, func, city)
+		bot.send_message(message.from_user.id, 'Вы ввели неправильное количество отелей!')
+		bot.send_message(message.from_user.id, 'Введите новое:')
+		bot.register_next_step_handler(message, dates, func, city)
 
-
-# def dates(message, func: str, city: str) -> None:
-# 	call, step = DetailedTelegramCalendar().build()
-# 	bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}', reply_markup = call)
-#
-#
 # @bot.callback_query_handler(func = DetailedTelegramCalendar.func())
 # def cal(message) -> None:
 # 	print(message)

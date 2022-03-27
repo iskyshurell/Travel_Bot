@@ -1,0 +1,4 @@
+python-dotenv~=0.19.2
+peewee~=3.14.10
+textblob~=0.17.1
+requests~=2.22.0
