@@ -23,11 +23,11 @@ class Request(BaseModel):
 	city = IntegerField()
 	time = DateTimeField()
 	func = CharField()
-	dist = FloatField()
-	m_price = IntegerField()
+	dist = FloatField(null = True)
+	m_price = IntegerField(null = True)
 	n_hotels = IntegerField()
-	s_date = DateTimeField()
-	f_date = DateTimeField()
+	s_date = DateTimeField(null = True)
+	f_date = DateTimeField(null = True)
 
 
 class Hotel(BaseModel):
@@ -56,8 +56,8 @@ def request_info(request_id: int, u_id: int) -> Request:
 
 
 def request_update(user_id: int, time: datetime = datetime.now(), city: int = 0,
-					func: str = 'None', dist: float = 0.0, m_price: int = 0, n_hotels: int = 0,
-					s_date: datetime = datetime.now(), f_date: datetime = datetime.now()):
+					func: str = 'None', dist: float = None, m_price: int = None, n_hotels: int = 0,
+					s_date: datetime = None, f_date: datetime = None):
 
 	with db:
 		user = User.select().where(User.id == user_id).get()

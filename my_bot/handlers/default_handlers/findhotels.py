@@ -121,17 +121,27 @@ def cal(message) -> None:
 		with db:
 			user = message.message.chat
 			req = get_last_req(user.id)
-			req.s_date = result
 			func = req.func
 			city = req.city
+	
+			if not req.s_date:
+				req.s_date = result
+				req.save()
+				call, step = DetailedTelegramCalendar().build()
+				bot.send_message(message.from_user.id, f'Выберите дату отьезда: ')
+				bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}',
+				                 reply_markup = call)
 
-		bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
-		                 reply_markup = interface.get_ui('del'))
+			else:
+				req.f_date = result
+				req.save()
+				bot.send_message(message.from_user.id, "Отлично!\nВведите количество нужных отелей: ",
+				                 reply_markup = interface.get_ui('del'))
 
-		if req.func != 'bestdeal':
-			bot.register_next_step_handler(message.message, final_result, func, city)
-		else:
-			bot.register_next_step_handler(message.message, optional_func, func, city)
+				if req.func != 'bestdeal':
+					bot.register_next_step_handler(message.message, final_result, func, city)
+				else:
+					bot.register_next_step_handler(message.message, optional_func, func, city)
 
 
 def optional_func(message, func1: str, city: str) -> None:
