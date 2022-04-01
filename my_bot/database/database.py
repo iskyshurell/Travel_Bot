@@ -19,7 +19,8 @@ class User(BaseModel):
 
 class Request(BaseModel):
 	user = ForeignKeyField(User, related_name = 'requests')
-	request_id = IntegerField(primary_key = True)
+	request_id = AutoField(primary_key = True)
+	city = IntegerField()
 	time = DateTimeField()
 	func = CharField()
 	dist = FloatField()
@@ -54,15 +55,15 @@ def request_info(request_id: int, u_id: int) -> Request:
 		return request
 
 
-def request_update(user_id: int, request_id: int, time: datetime = datetime.now(),
-				func: str = 'None', dist: float = 0.0, m_price: int = 0, n_hotels: int = 0,
-				s_date: datetime = datetime.now(), f_date: datetime = datetime.now()):
+def request_update(user_id: int, time: datetime = datetime.now(), city: int = 0,
+					func: str = 'None', dist: float = 0.0, m_price: int = 0, n_hotels: int = 0,
+					s_date: datetime = datetime.now(), f_date: datetime = datetime.now()):
 
 	with db:
 		user = User.select().where(User.id == user_id).get()
-		Request.create(user = user, time = time, request_id = request_id,
-								func = func, dist = dist, m_price = m_price, n_hotels = n_hotels,
-								s_date = s_date, f_date = f_date)
+		Request.create(user = user, time = time, city = city,
+						func = func, dist = dist, m_price = m_price, n_hotels = n_hotels,
+						s_date = s_date, f_date = f_date)
 
 
 def db_update(req_id: int, massive: Tuple) -> None:
@@ -82,14 +83,6 @@ def create_user(name: str, fname: str, sname: str, u_id: int) -> None:
 		User.create(username = name, first_name = fname, surname = sname, id = u_id)
 
 
-def all_info(u_id: int) -> Hotel:
-	with db:
-		user = user_inf(u_id)
-		for i in user.requests:
-			for i_h in i.hotels:
-				yield i_h
-
-
 def get_last_req(u_id: int):
 	with db:
 		user = User.select().where(User.id == u_id).get()
@@ -102,29 +95,6 @@ if __name__ == '__main__':
 		Request.create_table()
 		Hotel.create_table()
 		Photo.create_table()
+		for i in User.select():
+			print(i)
 
-		# create_user('gg', 'wp', 'we', 1234)
-		# request_update(1234, 2)
-		print(get_last_req(1234))
-	# 	print(request_info(000, 1234))
-	# 	db_update(000, ('Отель «Ингул»', 'ул. Адмиральская, 34', '3,8 км', '1,570 RUB',
-	#             ['https://exp.cdn-hotels.com/hotels/28000000/27320000/27317800/27317796/481e0d06_z.jpg',
-	#              'https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/45c48d5c_z.jpg']))
-	# #
-	# db_update(1234, ('INgyl', 'dsgesg2', '1.2 km', '1200 RUB', 'gfgr'))
-
-	# u1 = User.create(name = 'Isky', id = 1234)
-	#
-	# h1 = Hotel.create(requester = u1, name = 'Отель «Ингул»', address = 'ул. Адмиральская, 34', dist = '3,8 км', price = '2340 RUB')
-	#
-	# p1 = Photo.create(hotel_ph = h1, photo = 'https://exp.cdn-hotels.com/hotels/28000000/27320000/27317800/27317796/481e0d06_z.jpg')
-	#
-	# p2 = Photo.create(hotel_ph = h1, photo = 'https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/45c48d5c_z.jpg')
-	# db_update(1234, ('Отель «Ингул»', 'ул. Адмиральская, 34', '3,8 км', '1,570 RUB',
-	#             ['https://exp.cdn-hotels.com/hotels/28000000/27320000/27317800/27317796/481e0d06_z.jpg',
-	#              'https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/45c48d5c_z.jpg']))
-	# info = user_inf(1234)
-	# for i_h in info[1]:
-	# 	print(i_h.name, i_h.time, i_h.address, i_h.price, i_h.dist)
-	# 	for i_ph in i_h.photos:
-	# 		print(i_ph.photo)

@@ -17,7 +17,7 @@ def load_db() -> None:
 		User.create_table()
 		Hotel.create_table()
 		Photo.create_table()
-
+		Request.create_table()
 
 ui = UI()
 add_reply_keyboard(ui, 3, 'lowprice', 'highprice', 'bestdeal', 'history', 'next', 'Назад в меню', board = 'help')
