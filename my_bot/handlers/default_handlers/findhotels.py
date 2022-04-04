@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import time
 from loader import bot, interface
 import re
@@ -193,7 +195,6 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 
 		if result:
 			result = get_hotel(city)
-			print(result)
 			hotels = sort(result, func1, min_, dist)
 
 			with db:
