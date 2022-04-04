@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from peewee import *
 from typing import Tuple
@@ -29,6 +30,9 @@ class Request(BaseModel):
 	s_date = DateTimeField(null = True)
 	f_date = DateTimeField(null = True)
 
+	def __str__(self):
+		return f'{self.s_date}  {self.f_date}'
+
 
 class Hotel(BaseModel):
 	requester = ForeignKeyField(Request, related_name = 'hotels')
@@ -36,6 +40,7 @@ class Hotel(BaseModel):
 	address = CharField()
 	dist = CharField()
 	price = CharField()
+	full_price = CharField()
 
 
 class Photo(BaseModel):
@@ -89,12 +94,27 @@ def get_last_req(u_id: int):
 		return user.requests[-1]
 
 
+def dates_difference(f_d: str, s_d: str):
+	f_d, s_d = re.search(r'\S+', f_d).group(), re.search(r'\S+', s_d).group()
+	f_d, s_d = datetime.strptime(f_d, '%Y-%m-%d'), datetime.strptime(s_d, '%Y-%m-%d')
+	return max(f_d - s_d, s_d - f_d)
+
+
 if __name__ == '__main__':
 	with db:
 		User.create_table()
 		Request.create_table()
 		Hotel.create_table()
 		Photo.create_table()
-		for i in User.select():
-			print(i)
+		for i in User.select(): 
+			for i_r in i.requests:
 
+				obj = i_r.__str__().split('  ')
+
+
+				if obj[0] != 'None':
+					obj = [i.split(' ')[0] for i in obj]
+					f_date = datetime.strptime(obj[-1], '%Y-%m-%d')
+					s_date = datetime.strptime(obj[-2], '%Y-%m-%d')
+					days = f_date - s_date
+					print(type(days))

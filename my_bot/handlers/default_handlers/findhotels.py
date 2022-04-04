@@ -1,12 +1,11 @@
 import time
-from loader import bot, interface
+from loader import bot, interface, translator
 import re
 from database import *
 from rapidapi.get_hotels import get_city, get_hotel
 from rapidapi.sort_api import sort
 from keyboards import inline
 from telegram_bot_calendar import LSTEP, DetailedTelegramCalendar
-from textblob import TextBlob
 
 
 @bot.message_handler(commands = ['find-hotels', 'lowprice', 'highprice', 'bestdeal', 'history'])
@@ -194,10 +193,14 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 			result = get_hotel(city)
 			hotels = sort(result, func1, min_, dist)
 
+			with db:
+				request = get_last_req(message.chat.id)
+				days = dates_difference(request.s_date, request.f_date)
+
 			for i in range(min(n, len(hotels))):
 				temp = hotels[i]
 				bot.send_message(message.from_user.id,
-				                 f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города:  {temp[2]}\n- Цена:  {temp[3]}',
+				                 f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города:  {temp[2]}\n- Цена:  {temp[3]}, Полная цена: {int(re.sub(r"[RUB, ]", "", temp[3])) * days}',
 				                 reply_markup = interface.get_ui('next'))
 				for i_ph in temp[-1]:
 					bot.send_message(message.from_user.id, i_ph)
