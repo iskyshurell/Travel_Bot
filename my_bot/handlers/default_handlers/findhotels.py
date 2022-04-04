@@ -1,11 +1,12 @@
 import time
-from loader import bot, interface, translator
+from loader import bot, interface
 import re
 from database import *
 from rapidapi.get_hotels import get_city, get_hotel
 from rapidapi.sort_api import sort
 from keyboards import inline
 from telegram_bot_calendar import LSTEP, DetailedTelegramCalendar
+from itranslate import itranslate
 
 
 @bot.message_handler(commands = ['find-hotels', 'lowprice', 'highprice', 'bestdeal', 'history'])
@@ -92,6 +93,8 @@ def dates(message) -> None:
 	info = info.split('-')
 	city, func, name = info[0], info[1], info[2]
 
+	bot.edit_message_text(f'Вы выбрали {name}', message.message.chat.id, message.message.message_id)
+
 	with db:
 		user = message.message.chat
 		try:
@@ -104,7 +107,7 @@ def dates(message) -> None:
 
 	call, step = DetailedTelegramCalendar().build()
 	bot.send_message(message.from_user.id, f'Выберите дату заезда: ')
-	bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}',
+	bot.send_message(message.from_user.id, f'Выберите {itranslate(LSTEP[step], to_lang = "ru")}',
 	                 reply_markup = call)
 
 
@@ -113,7 +116,7 @@ def cal(message) -> None:
 	result, key, step = DetailedTelegramCalendar().process(message.data)
 
 	if not result:
-		bot.edit_message_text(f"Выберите {TextBlob(LSTEP[step]).translate(to = 'ru')}", message.message.chat.id, message.message.message_id, reply_markup = key)
+		bot.edit_message_text(f"Выберите {itranslate(LSTEP[step], to_lang = 'ru')}", message.message.chat.id, message.message.message_id, reply_markup = key)
 	elif result:
 		bot.edit_message_text(f'Вы выбрали {result}', message.message.chat.id, message.message.message_id)
 
@@ -128,7 +131,7 @@ def cal(message) -> None:
 				req.save()
 				call, step = DetailedTelegramCalendar().build()
 				bot.send_message(message.from_user.id, f'Выберите дату отьезда: ')
-				bot.send_message(message.from_user.id, f'Выберите {TextBlob(LSTEP[step]).translate(to = "ru")}',
+				bot.send_message(message.from_user.id, f'Выберите {itranslate(LSTEP[step], to_lang = "ru")}',
 				                 reply_markup = call)
 
 			else:
@@ -169,7 +172,6 @@ def optional_dist(message, func1, city, n):
 		bot.register_next_step_handler(message, optional_dist, func1, city, n)
 
 
-
 def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist: float = 0.0,
                  b_flag: bool = False) -> None:
 	try:
@@ -191,17 +193,19 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 
 		if result:
 			result = get_hotel(city)
+			print(result)
 			hotels = sort(result, func1, min_, dist)
 
 			with db:
 				request = get_last_req(message.chat.id)
 				days = dates_difference(request.s_date, request.f_date)
-
+				print(days)
+			print(hotels, result)
 			for i in range(min(n, len(hotels))):
 				temp = hotels[i]
 				bot.send_message(message.from_user.id,
-				                 f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города:  {temp[2]}\n- Цена:  {temp[3]}, Полная цена: {int(re.sub(r"[RUB, ]", "", temp[3])) * days}',
-				                 reply_markup = interface.get_ui('next'))
+								f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города: {temp[2]}\n- Цена: {temp[3]}',
+								reply_markup = interface.get_ui('next'))
 				for i_ph in temp[-1]:
 					bot.send_message(message.from_user.id, i_ph)
 

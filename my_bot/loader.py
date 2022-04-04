@@ -4,7 +4,6 @@ from Interface.UI import *
 from keyboards.reply import *
 from keyboards.remove import *
 from config.load_data import token
-from googletrans import Translator
 
 
 def load(token: str) -> telebot.TeleBot:
@@ -31,7 +30,6 @@ interface = ui
 
 bot = load(token)
 load_db()
-translator = Translator()
 
 
 if __name__ == '__main__':

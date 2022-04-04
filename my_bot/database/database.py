@@ -117,4 +117,4 @@ if __name__ == '__main__':
 					f_date = datetime.strptime(obj[-1], '%Y-%m-%d')
 					s_date = datetime.strptime(obj[-2], '%Y-%m-%d')
 					days = f_date - s_date
-					print(type(days))
+					print(days.days)
