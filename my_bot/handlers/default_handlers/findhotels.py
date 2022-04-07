@@ -35,25 +35,25 @@ def func_choose(message, flag: bool = False, func: str = '') -> None:
 				raise ValueError
 
 			if func == 'history':
-				pass
-				# with db:
-				# 	user = message.from_user
-				#
-				# 	try:
-				# 		if User.select().where(User.id == user.id and User.username == user.username):
-				# 			temp_info = user_inf(user.id)
-				#
-				# 			for i_h in temp_info.hotels:
-				# 				time.sleep(1)
-				# 				bot.send_message(user.id, f'Время запроса: {i_h.time}\nИмя отеля: {i_h.name}\nАдресс отеля: {i_h.address}\nДистанция до центра города: {i_h.dist}\nСтомость проживания в отеле: {i_h.price}')
-				# 				for i_p in i_h.photos:
-				# 					bot.send_message(user.id, f'{i_p.photo}')
-				# 			bot.send_message(user.id, f'Отлично! Операция прошла успешно\nВот все запросы сделанные из аккаунта {temp_info.first_name}, {temp_info.surname}', reply_markup = interface.get_ui('next'))
-				# 			bot.register_next_step_handler(message, next_h)
-				#
-				# 	except (DoesNotExist, OperationalError):
-				# 		bot.send_message(user.id, 'Похоже вы ещё не делали запросов(', reply_markup = interface.get_ui('next'))
-				# 		bot.register_next_step_handler(message, next_h)
+				with db:
+					user = message.from_user
+					print(User.select().where(User.id == user.id and User.username == user.username).get())
+					try:
+						if User.select().where(User.id == user.id and User.username == user.username).get():
+							temp_info = user_info(user.id)
+
+							for i_r in temp_info.requests:
+
+								for i_h in i_r.hotels:
+									time.sleep(1)
+									bot.send_message(user.id, f'Время запроса: {i_h.time}\nИмя отеля: {i_h.name}\nАдресс отеля: {i_h.address}\nДистанция до центра города: {i_h.dist}\nСтомость проживания в отеле: {i_h.price}, Общаю стоимость: {i_h.total_price} RUB')
+									for i_p in i_h.photos:
+										bot.send_message(user.id, f'{i_p.photo}')
+							bot.send_message(user.id, f'Отлично! Операция прошла успешно\nВот все запросы сделанные из аккаунта {temp_info.first_name}, {temp_info.surname}', reply_markup = interface.get_ui('next'))
+							bot.register_next_step_handler(message, next_h)
+					except (DoesNotExist, OperationalError) as er:
+						bot.send_message(user.id, 'Похоже вы ещё не делали запросов(', reply_markup = interface.get_ui('next'))
+						bot.register_next_step_handler(message, next_h)
 
 			else:
 

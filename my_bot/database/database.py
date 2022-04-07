@@ -48,7 +48,7 @@ class Photo(BaseModel):
 	photo = CharField()
 
 
-def user_inf(u_id: int) -> User:
+def user_info(u_id: int) -> User:
 	with db:
 		result = User.select().where(User.id == u_id).get()
 		return result
@@ -106,8 +106,7 @@ if __name__ == '__main__':
 		Request.create_table()
 		Hotel.create_table()
 		Photo.create_table()
-		for i in User.select(): 
-			print(i.username)
-			for i_r in i.requests:
-				for i in i_r.hotels:
-					print(i.price)
+		for i in User.select():
+			for i2 in i.requests:         
+				for i3 in i2.hotels:
+					print(i3)
