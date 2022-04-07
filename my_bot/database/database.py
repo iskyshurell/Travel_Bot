@@ -40,7 +40,7 @@ class Hotel(BaseModel):
 	address = CharField()
 	dist = CharField()
 	price = CharField()
-	full_price = CharField()
+	total_price = CharField()
 
 
 class Photo(BaseModel):
@@ -76,8 +76,8 @@ def db_update(req_id: int, massive: Tuple) -> None:
 
 		try:
 			request = Request.select().where(Request.request_id == req_id).get()
-			hotel = Hotel.create(requester = request, time = datetime.now(), name = f'{massive[0]}', address = f'{massive[1]}', dist = f'{massive[2]}', price = f'{massive[3]}')
-			for i_ph in massive[4]:
+			hotel = Hotel.create(requester = request, time = datetime.now(), name = f'{massive[0]}', address = f'{massive[1]}', dist = f'{massive[2]}', price = f'{massive[3]}', total_price = f'{massive[4]}')
+			for i_ph in massive[-1]:
 				Photo.create(hotel_ph = hotel, photo = i_ph)
 		except DoesNotExist:
 			print("No User")
@@ -95,7 +95,7 @@ def get_last_req(u_id: int):
 
 
 def dates_difference(f_d: str, s_d: str):
-	f_d, s_d = re.search(r'\S+', f_d).group(), re.search(r'\S+', s_d).group()
+	f_d, s_d = re.search(r'\S+', str(f_d)).group(), re.search(r'\S+', str(s_d)).group()
 	f_d, s_d = datetime.strptime(f_d, '%Y-%m-%d'), datetime.strptime(s_d, '%Y-%m-%d')
 	return max(f_d - s_d, s_d - f_d)
 
@@ -107,14 +107,7 @@ if __name__ == '__main__':
 		Hotel.create_table()
 		Photo.create_table()
 		for i in User.select(): 
+			print(i.username)
 			for i_r in i.requests:
-
-				obj = i_r.__str__().split('  ')
-
-
-				if obj[0] != 'None':
-					obj = [i.split(' ')[0] for i in obj]
-					f_date = datetime.strptime(obj[-1], '%Y-%m-%d')
-					s_date = datetime.strptime(obj[-2], '%Y-%m-%d')
-					days = f_date - s_date
-					print(days.days)
+				for i in i_r.hotels:
+					print(i.price)

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import time
 from loader import bot, interface
 import re
@@ -176,57 +174,68 @@ def optional_dist(message, func1, city, n):
 
 def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist: float = 0.0,
                  b_flag: bool = False) -> None:
-	try:
-		if b_flag:
-			result = re.search(r'[,\d]+', message.text)
-			if result:
-				dist = re.sub(r'[,]', '.', message.text)
-				dist = float(dist)
-		else:
-			result = re.search(r'[ \D]', message.text)
-			if not result:
-				result = True
-
-				n = int(n)
-				if n == 0:
-					n = int(message.text)
-				else:
-					min_ = int(message.text)
-
+	if b_flag:
+		result = re.search(r'[,\d]+', message.text)
 		if result:
-			result = get_hotel(city)
-			hotels = sort(result, func1, min_, dist)
+			dist = re.sub(r'[,]', '.', message.text)
+			dist = float(dist)
+	else:
+		result = re.search(r'[ \D]', message.text)
+		if not result:
+			result = True
 
-			with db:
-				request = get_last_req(message.chat.id)
-				days = dates_difference(request.s_date, request.f_date)
-				print(days)
-			print(hotels, result)
-			for i in range(min(n, len(hotels))):
-				temp = hotels[i]
-				bot.send_message(message.from_user.id,
-								f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города: {temp[2]}\n- Цена: {temp[3]}',
-								reply_markup = interface.get_ui('next'))
-				for i_ph in temp[-1]:
-					bot.send_message(message.from_user.id, i_ph)
+			n = int(n)
+			if n == 0:
+				n = int(message.text)
+			else:
+				min_ = int(message.text)
+		else:
+			if n == 0:
+				bot.send_message(message.from_user.id, 'Вы ввели неправильное количество отелей!')
+				bot.send_message(message.from_user.id, 'Введите новое:')
+				bot.register_next_step_handler(message, final_result, func1, city)
+			else:
+				bot.send_message(message.from_user.id, 'Вы ввели неправильную максимальную дистанцию отеля до центра города!')
+				bot.send_message(message.from_user.id, 'Введите новую дистанцию отеля до центра города:')
+				bot.register_next_step_handler(message, final_result, func1, city, n)
 
-			# with db:
-			# 	user = message.from_user
-			# 	try:
-			# 		obj = User.select().where(User.id == user.id and User.username == user.username).get()
-			#
-			# 	except (DoesNotExist, OperationalError):
-			# 		create_user(name = user.username, fname = user.first_name, sname = user.last_name, u_id = user.id)
-			#
-			# 	finally:
-			# 		u_id = user.id
-			# 		for i in range(min(n, len(hotels))):
-			# 			temp = hotels[i]
-			# 			db_update(u_id, temp)
-			bot.register_next_step_handler(message, next_h)
+	if result:
+		result = get_hotel(city)
+		hotels = sort(result, func1, min_, dist)
 
-	except TypeError as er:
-		print(er)
+		with db:
+			request = get_last_req(message.chat.id)
+			days = dates_difference(request.s_date, request.f_date)
+			days = max(int(days.days), 1)
+		for i in range(min(n, len(hotels))):
+			temp = hotels[i]
+
+			total_p = "Error not found"
+			if temp[3] != 'Error not found':
+				total_p = int(re.sub(r"[RUB, ]", "", temp[3])) * days
+
+			bot.send_message(message.from_user.id,
+							f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города: {temp[2]}\n- Цена: {temp[3]}\n- Полная цена за {days} дней: {total_p} RUB',
+							reply_markup = interface.get_ui('next'))
+			for i_ph in temp[-1]:
+				bot.send_message(message.from_user.id, i_ph)
+
+			hotels[i] = (temp[0], temp[1], temp[2], temp[3], total_p, temp[-1])
+			print(hotels[i])
+		with db:
+			user = message.from_user
+			try:
+				obj = User.select().where(User.id == user.id and User.username == user.username).get()
+
+			except (DoesNotExist, OperationalError):
+				create_user(name = user.username, fname = user.first_name, sname = user.last_name, u_id = user.id)
+
+			finally:
+				u_id = user.id
+				for i in range(min(n, len(hotels))):
+					temp = hotels[i]
+					db_update(u_id, temp)
+		bot.register_next_step_handler(message, next_h)
 
 
 def next_h(message) -> None:

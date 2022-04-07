@@ -1,11 +1,12 @@
 from typing import Dict, List, Tuple, Iterable, Union
-# from config.load_data import api_key, api_key2
+from config.load_data import api_key, api_key2
 import requests
 import json
 import re
 
-api_key = 'f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8'
-api_key2 = '39b50a7edamsh1bb6fd79c247c85p1d94f7jsn25fe3660cab3'
+# api_key = 'f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8'
+# api_key2 = '39b50a7edamsh1bb6fd79c247c85p1d94f7jsn25fe3660cab3'
+
 
 def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
     try:
@@ -26,12 +27,14 @@ def get_photos(id: str) -> List:
     response = get_massive(url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos",
                            querystring = {"id": id},
                            headers = {'x-rapidapi-host': "hotels4.p.rapidapi.com", 'x-rapidapi-key': api_key})
+    try:
+        all_ph = [re.sub(r"{size}", r"z", i['baseUrl']) for i in response.get('hotelImages')]
 
-    all_ph = [re.sub(r"{size}", r"z", i['baseUrl']) for i in response.get('hotelImages')]
-
-    if len(all_ph) < 2:
-        return all_ph
-    return all_ph[:2]
+        if len(all_ph) < 2:
+            return all_ph
+        return all_ph[:2]
+    except AttributeError:
+        print('Ошибка запроса')
 
 
 def getter(massive: Dict, args: List[str or int]) -> Union[str, Iterable]:
