@@ -66,15 +66,19 @@ def get_city(city: str) -> Dict:
 
 
 def choose_city(temp: Dict) -> Dict:
-    pattern = r"\W|[q,w,e,r,t,y,u,i,o,p,a,s,d,f,g,h,j,k,l,z,x,c,v,b,n,m]"
-    sec_pattern = r"\s{2,}"
-    city = dict()
+    try:
+        pattern = r"\W|[q,w,e,r,t,y,u,i,o,p,a,s,d,f,g,h,j,k,l,z,x,c,v,b,n,m]"
+        sec_pattern = r"\s{2,}"
+        city = dict()
 
-    for i_city in temp['suggestions'][0]['entities']:
-        name = re.sub(pattern, ' ', i_city['caption'])
-        name = re.sub(sec_pattern, ' ', name)
-        city[name] = i_city["destinationId"]
-    return city
+        for i_city in temp['suggestions'][0]['entities']:
+            name = re.sub(pattern, ' ', i_city['caption'])
+            name = re.sub(sec_pattern, ' ', name)
+            city[name] = i_city["destinationId"]
+        return city
+    except TypeError:
+        print('Похоже сервер вернул не то что нужно')
+        raise ValueError('Неправильное содержимое обьекта')
 
 
 def get_hotel(city_id: str) -> List:

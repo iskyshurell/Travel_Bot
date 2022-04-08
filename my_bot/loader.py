@@ -29,6 +29,7 @@ add_reply_keyboard(ui, 2, '/lowprice', '/highprice', '/bestdeal', '/history', bo
 interface = ui
 
 bot = load(token)
+bot.enable_save_next_step_handlers(delay=2)
 load_db()
 
 
