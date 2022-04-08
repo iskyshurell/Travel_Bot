@@ -43,7 +43,6 @@ def func_choose(message, flag: bool = False, func: str = '') -> None:
 							temp_info = user_info(user.id)
 
 							for i_r in temp_info.requests:
-
 								for i_h in i_r.hotels:
 									time.sleep(1)
 									bot.send_message(user.id, f'Время запроса: {i_h.time}\nИмя отеля: {i_h.name}\nАдресс отеля: {i_h.address}\nДистанция до центра города: {i_h.dist}\nСтомость проживания в отеле: {i_h.price}, Общаю стоимость: {i_h.total_price} RUB')
@@ -208,6 +207,7 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 			days = dates_difference(request.s_date, request.f_date)
 			days = max(int(days.days), 1)
 		for i in range(min(n, len(hotels))):
+			time.sleep(1)
 			temp = hotels[i]
 
 			total_p = "Error not found"

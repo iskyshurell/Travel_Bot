@@ -9,4 +9,4 @@ if __name__ == '__main__':
 
 		bot.polling()                   
 	except BaseException as er:
-		print('Одна ошибка и ты ошибся')
+		print('Похоже бот крашнулся :(')
