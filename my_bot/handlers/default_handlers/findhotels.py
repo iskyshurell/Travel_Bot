@@ -196,19 +196,24 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 
 	if result:
 		result = get_hotel(city)
-		hotels = sort(result, func1, min_, dist)
 
 		with db:
 			request = get_last_req(message.chat.id)
 			days = dates_difference(request.s_date, request.f_date)
 			days = max(int(days.days), 1)
-		for i in range(min(n, len(hotels))):
-			time.sleep(1)
-			temp = hotels[i]
 
-			total_p = "Error not found"
+		new_hotels = []
+		for temp in sort(result, func1, min_, dist):
+			if n == 0:
+				break
+			n -= 1
+
+			time.sleep(1)
+
 			if temp[3] != 'Error not found':
 				total_p = int(re.sub(r"[RUB, ]", "", temp[3])) * days
+			else:
+				total_p = "Error not found"
 
 			bot.send_message(message.from_user.id,
 							f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города: {temp[2]}\n- Цена: {temp[3]}\n- Полная цена за {days} дней: {total_p} RUB',
@@ -216,7 +221,8 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 			for i_ph in temp[-1]:
 				bot.send_message(message.from_user.id, i_ph)
 
-			hotels[i] = (temp[0], temp[1], temp[2], temp[3], total_p, temp[-1])
+			new_hotels.append((temp[0], temp[1], temp[2], temp[3], total_p, temp[-1]))
+
 		with db:
 			user = message.from_user
 			try:
@@ -227,9 +233,10 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 
 			finally:
 				r_id = get_last_req(user.id)
-				for i in range(min(n, len(hotels))):
-					temp = hotels[i]
-					db_update(r_id, temp)
+				for i in new_hotels:
+					db_update(r_id, new_hotels)
+
+		bot.send_message(user.id, 'Отлично! Операция прошла успешно.', reply_markup = interface.get_ui('next'))
 		bot.register_next_step_handler(message, next_h)
 
 
