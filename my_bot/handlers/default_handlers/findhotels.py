@@ -37,18 +37,14 @@ def func_choose(message, flag: bool = False, func: str = '') -> None:
 			if func == 'history':
 				with db:
 					user = message.from_user
-					print(User.select().where(User.id == user.id and User.username == user.username).get())
 					try:
 						if User.select().where(User.id == user.id and User.username == user.username).get():
-							temp_info = user_info(user.id)
-
-							for i_r in temp_info.requests:
-								for i_h in i_r.hotels:
-									time.sleep(1)
-									bot.send_message(user.id, f'Время запроса: {i_h.time}\nИмя отеля: {i_h.name}\nАдресс отеля: {i_h.address}\nДистанция до центра города: {i_h.dist}\nСтомость проживания в отеле: {i_h.price}, Общаю стоимость: {i_h.total_price} RUB')
-									for i_p in i_h.photos:
-										bot.send_message(user.id, f'{i_p.photo}')
-							bot.send_message(user.id, f'Отлично! Операция прошла успешно\nВот все запросы сделанные из аккаунта {temp_info.first_name}, {temp_info.surname}', reply_markup = interface.get_ui('next'))
+							for i_h in all_user_info(user.id):
+								bot.send_message(user.id, f'Ваш отель:\n- Название отеля:  {i_h[0]}\n- Адресс:  {i_h[1]}\n- Расстояние до центра города: {i_h[2]}\n- Цена: {i_h[3]}\n- Полная цена: {i_h[4]} RUB')
+								for i_ph in i_h[5]:
+									print(i_h[5])
+									bot.send_message(user.id, i_ph)
+							bot.send_message(user.id, 'Отлично! Операция прошла успешно.', reply_markup = interface.get_ui('next'))
 							bot.register_next_step_handler(message, next_h)
 					except (DoesNotExist, OperationalError) as er:
 						bot.send_message(user.id, 'Похоже вы ещё не делали запросов(', reply_markup = interface.get_ui('next'))
@@ -221,7 +217,6 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 				bot.send_message(message.from_user.id, i_ph)
 
 			hotels[i] = (temp[0], temp[1], temp[2], temp[3], total_p, temp[-1])
-			print(hotels[i])
 		with db:
 			user = message.from_user
 			try:
@@ -231,10 +226,10 @@ def final_result(message, func1: str, city: str, n: int = 0, min_: int = 0, dist
 				create_user(name = user.username, fname = user.first_name, sname = user.last_name, u_id = user.id)
 
 			finally:
-				u_id = user.id
+				r_id = get_last_req(user.id)
 				for i in range(min(n, len(hotels))):
 					temp = hotels[i]
-					db_update(u_id, temp)
+					db_update(r_id, temp)
 		bot.register_next_step_handler(message, next_h)
 
 

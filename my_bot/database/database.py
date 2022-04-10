@@ -60,6 +60,13 @@ def request_info(request_id: int, u_id: int) -> Request:
 		return request
 
 
+def all_user_info(u_id: int) -> Tuple:
+	user = user_info(u_id)
+	for i_r in user.requests:
+		for i_h in i_r.hotels:
+			yield i_h.name, i_h.address, i_h.dist, i_h.price, i_h.total_price, [i_ph.photo for i_ph in i_h.photos]
+
+
 def request_update(user_id: int, time: datetime = datetime.now(), city: int = 0,
 					func: str = 'None', dist: float = None, m_price: int = None, n_hotels: int = 0,
 					s_date: datetime = None, f_date: datetime = None):
@@ -101,12 +108,13 @@ def dates_difference(f_d: str, s_d: str):
 
 
 if __name__ == '__main__':
+	nm = ('Отель «Ингул»', 'ул. Адмиральская, 34', '3,8 км', '1,741 RUB', 48748, ['https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/b97327bd_z.jpg', 'https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/45c48d5c_z.jpg'])
+	uid = 1369589666
 	with db:
 		User.create_table()
 		Request.create_table()
 		Hotel.create_table()
 		Photo.create_table()
-		for i in User.select():
-			for i2 in i.requests:         
-				for i3 in i2.hotels:
-					print(i3)
+		user = user_info(uid)
+		for i in all_user_info(uid):
+			print(i)
