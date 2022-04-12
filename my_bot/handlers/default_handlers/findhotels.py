@@ -32,7 +32,10 @@ def func_choose(message, flag: bool = False, func: str = '') -> None:
 				func = 'history'
 
 			else:
-				raise ValueError
+				bot.send_message(message.from_user.id, 'Вы ввели неправильную функцию:')
+				bot.send_message(message.from_user.id, '-- Введите новую или вернитесь в меню --',
+				                 reply_markup = interface.get_ui('next'))
+				bot.register_next_step_handler(message, next_h)
 
 			if func == 'history':
 				with db:
@@ -60,12 +63,6 @@ def func_choose(message, flag: bool = False, func: str = '') -> None:
 			bot.send_message(message.from_user.id, 'Введите функцию: ', reply_markup = interface.get_ui('mar'))
 			bot.register_next_step_handler(message, func_choose)
 
-	except ValueError as er:
-		print(er)
-		bot.send_message(message.from_user.id, 'Вы ввели неправильную функцию:')
-		bot.send_message(message.from_user.id, '-- Введите новую или вернитесь в меню --',
-		                 reply_markup = interface.get_ui('next'))
-		bot.register_next_step_handler(message, next_h)
 
 
 def get_cities(message, func1: str) -> None:

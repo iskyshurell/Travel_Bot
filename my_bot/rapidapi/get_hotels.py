@@ -4,9 +4,6 @@ import requests
 import json
 import re
 
-# api_key = 'f68d8d2cf0msh45f08eaee8ee6d7p117ea9jsn7b5b60d5d6f8'
-# api_key2 = '39b50a7edamsh1bb6fd79c247c85p1d94f7jsn25fe3660cab3'
-
 
 def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
     try:
