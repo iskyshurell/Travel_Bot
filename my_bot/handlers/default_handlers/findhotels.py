@@ -166,6 +166,7 @@ def optional_dist(message: tp.Message, func: str, city: str, n: int):
 
 def best_deal_check(message: tp.Message, func: str, city: str, n: int = 0, min_: int = 0, dist: float = 0.0,
                  bd_flag: bool = False):
+	bot.send_message(message.from_user.id, 'Ожидайте! Вскоре мы сможем показать вам ваши отели.')
 	if bd_flag:
 		result = re.search(r'[,\d]+', message.text)
 		if result:
@@ -213,29 +214,34 @@ def result_check(message: tp.Message, result: Union[bool, re.search], func: str,
 
 def send_info(message: tp.Message, result: List, func: str, n: int, min_: int, dist: float, days: int):
 	new_hotels = []
-	for temp in sort(result, func, min_, dist):
-		if n == 0:
-			break
-		n -= 1
+	u_hotels = sort(result, func, min_, dist)
+	if len(u_hotels) > 0:
+		for temp in u_hotels:
+			if n == 0:
+				break
+			n -= 1
 
-		time.sleep(1)
+			time.sleep(1)
 
-		if temp[3] != 'Error not found':
-			total_p = int(re.sub(r"[RUB, ]", "", temp[3])) * days
-		else:
-			total_p = "Error not found"
+			if temp[3] != 'Error not found':
+				total_p = int(re.sub(r"[RUB, ]", "", temp[3])) * days
+			else:
+				total_p = "Error not found"
 
-		bot.send_message(message.from_user.id,
-		                 f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города: {temp[2]}\n- Цена: {temp[3]}\n- Полная цена за {days} дней: {total_p} RUB',
-		                 reply_markup = interface.get_ui('next'))
-		for i_ph in temp[-1]:
-			bot.send_message(message.from_user.id, i_ph)
+			bot.send_message(message.from_user.id,
+			                 f'Ваш отель:\n- Название отеля:  {temp[0]}\n- Адресс:  {temp[1]}\n- Расстояние до центра города: {temp[2]}\n- Цена: {temp[3]}\n- Полная цена за {days} дней: {total_p} RUB',
+			                 reply_markup = interface.get_ui('next'))
+			for i_ph in temp[-1]:
+				bot.send_message(message.from_user.id, i_ph)
 
-		new_hotels.append((temp[0], temp[1], temp[2], temp[3], total_p, temp[-1]))
+			new_hotels.append((temp[0], temp[1], temp[2], temp[3], total_p, temp[-1]))
+		save_info(message, new_hotels[:])
+	else:
+		bot.send_message(message.from_user.id, 'Упс, похоже по вашему запросу ничего не нашлось :(')
+		bot.send_message(message.from_user.id, 'Попробуйте ещё раз или вернитесь в главное меню:', reply_markup = interface.get_ui('next'))
+		bot.register_next_step_handler(message, next_h)
 
-	save_info(message, new_hotels[:])
-
-
+	
 def save_info(message: tp.Message, new_hotels):
 	with db:
 		user = message.from_user
