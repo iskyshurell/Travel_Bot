@@ -61,7 +61,6 @@ def history(message: tp.Message) -> None:
 					bot.send_message(user.id,
 					                 f'Ваш отель:\n- Название отеля:  {i_h[0]}\n- Адресс:  {i_h[1]}\n- Расстояние до центра города: {i_h[2]}\n- Цена: {i_h[3]}\n- Полная цена: {i_h[4]} RUB')
 					for i_ph in i_h[5]:
-						print(i_h[5])
 						bot.send_message(user.id, i_ph)
 				bot.send_message(user.id, 'Отлично! Операция прошла успешно.', reply_markup = interface.get_ui('next'))
 				bot.register_next_step_handler(message, next_h)
