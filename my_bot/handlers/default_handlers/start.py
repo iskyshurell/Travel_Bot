@@ -2,7 +2,7 @@ from loader import bot, interface
 
 
 @bot.message_handler(content_types = 'text')
-def start_func(message) -> None:  # Обработчик начала работы с ботом
+def start(message) -> None:  # Обработчик начала работы с ботом
 	if message.text.lower() in ["привет", "/hello-world", "/start"]:
 		bot.send_message(message.from_user.id,
 		                 f'И тебе привет!\nТы в главном меню - выбери действие чтобы продолжить.',
