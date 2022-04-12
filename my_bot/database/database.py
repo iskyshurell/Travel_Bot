@@ -108,13 +108,13 @@ def dates_difference(f_d: str, s_d: str):
 
 
 if __name__ == '__main__':
-	nm = ('Отель «Ингул»', 'ул. Адмиральская, 34', '3,8 км', '1,741 RUB', 48748, ['https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/b97327bd_z.jpg', 'https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/45c48d5c_z.jpg'])
-	uid = 1369589666
 	with db:
 		User.create_table()
 		Request.create_table()
 		Hotel.create_table()
 		Photo.create_table()
-		user = user_info(uid)
-		for i in all_user_info(uid):
-			print(i)
+	mas = [('Отель «Ингул»', 'ул. Адмиральская, 34', '3,8 км', '1,810 RUB', 609970, ['https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/b97327bd_z.jpg', 'https://exp.cdn-hotels.com/hotels/27000000/26730000/26724300/26724285/45c48d5c_z.jpg']), ('Отель «Палас Украина»', 'Центральный пр-т, 57', '3,9 км', '3,031 RUB', 1021447, ['https://exp.cdn-hotels.com/hotels/28000000/27320000/27317800/27317796/481e0d06_z.jpg', 'https://exp.cdn-hotels.com/hotels/28000000/27320000/27317800/27317796/e524e902_z.jpg'])]
+	uid = 1369589666
+	for imas in mas:
+
+		db_update(get_last_req(uid), imas)

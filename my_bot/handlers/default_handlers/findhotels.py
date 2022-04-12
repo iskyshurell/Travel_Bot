@@ -186,7 +186,6 @@ def message_check(message: tp.Message, func: str, city: str, n: int = 0, min_: i
 			n = int(message.text)
 		else:
 			min_ = int(message.text)
-		print('ПОгналииии')
 		result_check(message, result, func, city, n, min_)
 	else:
 		if n == 0:
@@ -244,8 +243,8 @@ def save_info(message: tp.Message, new_hotels):
 		                                    id = user.id)
 
 		r_id = get_last_req(user.id)
-		for i in new_hotels:
-			db_update(r_id, new_hotels)
+		for i_h in new_hotels:
+			db_update(r_id, i_h)
 
 	bot.send_message(user.id, 'Отлично! Операция прошла успешно.', reply_markup = interface.get_ui('next'))
 	bot.register_next_step_handler(message, next_h)
