@@ -10,4 +10,3 @@ else:
 token = getenv('token')
 api_key = getenv('rapidapi_key')
 api_key2 = getenv('rapidapi_key2')
-

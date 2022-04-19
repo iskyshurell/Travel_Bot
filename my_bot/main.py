@@ -7,6 +7,7 @@ import handlers
 if __name__ == '__main__':
 	try:        
 		bot.load_next_step_handlers()                                           
-		bot.infinity_polling()          
+		bot.infinity_polling()
+
 	except BaseException as er:
 		print('Похоже бот крашнулся :(')

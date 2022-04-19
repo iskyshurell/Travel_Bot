@@ -6,10 +6,10 @@ from keyboards.remove import *
 from config.load_data import token
 
 
-def load(token: str) -> telebot.TeleBot:
+def load(b_token: str) -> telebot.TeleBot:
 
-	bot = telebot.TeleBot(token)
-	return bot
+	tele_bot = telebot.TeleBot(b_token)
+	return tele_bot
 
 
 def load_db() -> None:
