@@ -151,7 +151,7 @@ def dates(message: tp.CallbackQuery) -> None:
 
 		user = message.message.chat
 
-		person, status = User.get_or_create(
+		User.get_or_create(
 			username = user.username,
 			first_name = user.first_name,
 			surname = user.last_name,
@@ -464,7 +464,7 @@ def save_info(message: tp.Message, new_hotels):
 	with db:
 
 		user = message.from_user
-		person, status = User.get_or_create(
+		User.get_or_create(
 			username = user.username,
 			first_name = user.first_name,
 			surname = user.last_name,
