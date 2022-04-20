@@ -200,7 +200,7 @@ def request_update(
 	"""
 	Фунция request_update:
 
-	принимает 9 параметров:
+	принимает 9 аргументов:
 	-- user_id = int()
 	-- time = datetime() or datetime.now()
 	-- city = int() or 0
@@ -230,6 +230,17 @@ def request_update(
 
 
 def db_update(req_id: int, massive: Tuple) -> None:
+	"""
+	Функция db_update:
+
+	принимает 2 аргумента:
+	-- req_id = int()
+	-- massive = tuple()
+
+	Функция принимает массив с информацией про отель и заполняет базу данных отелями.
+
+	"""
+	
 	with db:
 
 		try:
@@ -253,6 +264,17 @@ def db_update(req_id: int, massive: Tuple) -> None:
 
 
 def create_user(name: str, fname: str, sname: str, u_id: int) -> None:
+	"""
+	Функция create_user:
+
+	принимает 4 аргумента:
+	-- name = str()
+	-- fname = str()
+	-- sname = str()
+	-- u_id = int()
+
+	Функуция принимает в себя параметры о пользователе и создаёт экземпляр класса User()
+	"""
 
 	with db:
 
@@ -265,6 +287,14 @@ def create_user(name: str, fname: str, sname: str, u_id: int) -> None:
 
 
 def get_last_req(u_id: int):
+	"""
+	Функция get_last_req:
+
+	принимает 1 аргумент:
+	-- u_id = int()
+
+	Возвращает обьект класса Request последний созданный
+	"""
 
 	with db:
 
@@ -273,6 +303,17 @@ def get_last_req(u_id: int):
 
 
 def dates_difference(f_d: str, s_d: str):
+	"""
+	Функция dates_difference:
+
+	принимает 2 аргумента:
+	-- f_d = str()
+	-- s_d = str()
+
+	Функция принимает 2 строки вида 1.01.2020,
+	делает из них обьекты datetime() и находит их разницу,
+	возвращает разницу большего от меньшего
+	"""
 
 	f_d, s_d = re.search(r'\S+', str(f_d)).group(), re.search(r'\S+', str(s_d)).group()
 
