@@ -7,11 +7,34 @@ db = SqliteDatabase('BDB')  # 'Bot Data Base'
 
 
 class BaseModel(Model):
+	"""
+	Базовый класс нужный для упрощения работы с последуйщими:
+
+	>> Имеет встроенный класс Meta для привязки базы данных. <<
+	Для этого класс BaseModel и нужен, чтобы не прописывать везде класс Meta.
+
+	"""
 	class Meta:
 		database = db
 
 
 class User(BaseModel):
+	"""
+	Класс User, дочерний от BaseModel:
+
+	>>
+		Хранит в себе информацию о пользователе,
+		о запросах которые он сделал
+	<<
+
+	Имеет 5 параметров:
+	-- username = str()
+	-- first_name = str()
+	-- surname = str()
+	-- id = int(), не может быть 2 одинаковых, каждый id уникален
+	-- requests = Список обьектов Request()
+
+	"""
 	username = CharField()
 
 	first_name = CharField()
@@ -21,6 +44,29 @@ class User(BaseModel):
 
 
 class Request(BaseModel):
+	"""
+	Класс Request, дочерний от BaseModel:
+
+	>>
+		Хранит в себе информацию о запросе,
+		о пользователя который сделал запрос,
+		об результатах запроса
+	<<
+
+	Имеет 11 аттрибутов:
+	-- user = User()
+	-- request_id = int(), уникальный параметр, не может быть 2 одинаковых
+	-- func = str()
+	-- city = str()
+	-- time = DateTime()
+	-- dist = float() or None
+	-- m_price = float() or None
+	-- n_hotels = int()
+	-- s_date = DateTime() or None
+	-- f_date = DateTime() or None
+	-- hotels = список из обьектов Hotel()
+
+	"""
 	user = ForeignKeyField(User, related_name = 'requests')
 	request_id = AutoField(primary_key = True)
 	func = CharField()
@@ -40,6 +86,25 @@ class Request(BaseModel):
 
 
 class Hotel(BaseModel):
+	"""
+	Класс Hotel, дочерний от BaseModel:
+
+	>>
+		Хранит информацию об отелях,
+		Фотографиях отелей,
+		Запросе отеля
+	<<
+
+	Имеет 7 аттрибутов:
+	-- requester = Request()
+	-- name = str()
+	-- address = str()
+	-- dist = str()
+	-- price = str()
+	-- total_price = str()
+	-- photos = список из обьектов Photo()
+
+	"""
 	requester = ForeignKeyField(Request, related_name = 'hotels')
 	name = CharField()
 
@@ -50,12 +115,34 @@ class Hotel(BaseModel):
 
 
 class Photo(BaseModel):
+	"""
+	Класс Photo, дочерний от BaseModel:
+
+	>>
+		Хранит фотографии отелей,
+		образец отеля
+	<<
+
+	Имеет 2 аттрибута:
+	-- hotel_ph = Hotel()
+	-- photo = str()
+
+	"""
 	hotel_ph = ForeignKeyField(Hotel, related_name = 'photos')
 
 	photo = CharField()
 
 
 def user_info(u_id: int) -> User:
+	"""
+	функция user_info:
+
+	принимает 1 аргумент:
+	-- u_id = int()
+
+	возвращает обьект класса User(), информацию о пользователе по id
+
+	"""
 
 	with db:
 		result = User.select().where(User.id == u_id).get()
@@ -64,6 +151,16 @@ def user_info(u_id: int) -> User:
 
 
 def request_info(request_id: int, u_id: int) -> Request:
+	"""
+	функция request_info:
+
+	принимает 2 аргумент:
+	-- request_id = int()
+	-- u_id = int()
+
+	Возвращает обьект класса Request(), запрос сделанный пользователем по r_id и u_id.
+
+	"""
 
 	with db:
 		request = Request.select().where(request_id == Request.request_id and u_id == Request.user).get()
@@ -72,6 +169,14 @@ def request_info(request_id: int, u_id: int) -> Request:
 
 
 def all_user_info(u_id: int) -> Tuple:
+	"""
+	функция-генератор all_user_info:
+
+	принимает 1 аргумент:
+	-- u_id = int()
+
+	Лениво возвращает информацию о всех отелях которые были запрошенны пользователем
+	"""
 
 	user = user_info(u_id)
 
@@ -82,17 +187,45 @@ def all_user_info(u_id: int) -> Tuple:
 
 
 def request_update(
-				user_id: int, time: datetime = datetime.now(), city: int = 0,
-				func: str = 'None', dist: float = None, m_price: int = None, n_hotels: int = 0,
-				s_date: datetime = None, f_date: datetime = None
+				user_id: int,
+				time: datetime = datetime.now(),
+				city: int = 0,
+				func: str = 'None',
+				dist: float = None,
+				m_price: int = None,
+				n_hotels: int = 0,
+				s_date: datetime = None,
+				f_date: datetime = None
 	):
+	"""
+	Фунция request_update:
+
+	принимает 9 параметров:
+	-- user_id = int()
+	-- time = datetime() or datetime.now()
+	-- city = int() or 0
+	-- func = str() or 'None'
+	-- dist = float() or None
+	-- m_price = int() or None
+	-- n_hotels = int() or 0
+	-- s_date = datetime() or None
+	-- f_date = datetime() or None
+
+	Обновляет базу данных новым запросом
+	"""
 
 	with db:
 		user = User.select().where(User.id == user_id).get()
 		Request.create(
-					user = user, time = time, city = city,
-					func = func, dist = dist, m_price = m_price, n_hotels = n_hotels,
-					s_date = s_date, f_date = f_date
+					user = user,
+					time = time,
+					city = city,
+					func = func,
+					dist = dist,
+					m_price = m_price,
+					n_hotels = n_hotels,
+					s_date = s_date,
+					f_date = f_date
 		)
 
 
@@ -123,7 +256,12 @@ def create_user(name: str, fname: str, sname: str, u_id: int) -> None:
 
 	with db:
 
-		User.create(username = name, first_name = fname, surname = sname, id = u_id)
+		User.create(
+			username = name,
+			first_name = fname,
+			surname = sname,
+			id = u_id
+		)
 
 
 def get_last_req(u_id: int):
@@ -137,6 +275,7 @@ def get_last_req(u_id: int):
 def dates_difference(f_d: str, s_d: str):
 
 	f_d, s_d = re.search(r'\S+', str(f_d)).group(), re.search(r'\S+', str(s_d)).group()
+
 	f_d, s_d = datetime.strptime(f_d, '%Y-%m-%d'), datetime.strptime(s_d, '%Y-%m-%d')
 
 	return max(f_d - s_d, s_d - f_d)
