@@ -4,6 +4,15 @@ from typing import Dict
 
 
 def add_inline_keyboard(iter_k: Dict, func: str) -> types.InlineKeyboardMarkup:
+	"""
+	Функция add_inline_keyboard:
+
+	принимает 2 аргумента:
+	-- iter_k = dict()
+	-- func = str()
+
+	Возвращает готовый InlineKeyboardMarkup()
+	"""
 
 	inline_keyboard = types.InlineKeyboardMarkup()
 
