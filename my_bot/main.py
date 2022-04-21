@@ -10,4 +10,4 @@ if __name__ == '__main__':
 		bot.infinity_polling()
 
 	except BaseException as er:
-		print('Похоже бот крашнулся :(')
+		print('Похоже бот крашнулся :(')                
