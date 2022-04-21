@@ -53,7 +53,7 @@ def func_choose(message: tp.Message, flag: bool = False, func: str = '') -> None
 		if func == 'history':
 
 			history(message)
-		else:
+		elif func != '':
 
 			bot.send_message(
 				chat_id = message.from_user.id,
@@ -359,7 +359,7 @@ def message_check(message: tp.Message, func: str, city: str, n: int = 0, min_: i
 				text = 'Введите новое:'
 			)
 
-			bot.register_next_step_handler(message, n_check, func, city)
+			bot.register_next_step_handler(message, message_check, func, city)
 		else:
 
 			bot.send_message(
@@ -371,7 +371,7 @@ def message_check(message: tp.Message, func: str, city: str, n: int = 0, min_: i
 				text = 'Введите новую дистанцию отеля до центра города:'
 			)
 
-			bot.register_next_step_handler(message, n_check, func, city, n)
+			bot.register_next_step_handler(message, message_check, func, city, n)
 
 
 def result_check(
