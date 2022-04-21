@@ -7,12 +7,23 @@ from config.load_data import token
 
 
 def load(b_token: str) -> telebot.TeleBot:
+	"""
+	Функция load:
+
+	принимает 1 аргумент:
+	-- b_token = str(), токен для бота
+
+	Возвращает самого бота для подальшей работы с ним.
+	"""
 
 	tele_bot = telebot.TeleBot(b_token)
 	return tele_bot
 
 
 def load_db() -> None:
+	"""
+	>> Подгружает базу данных db <<
+	"""
 	with db:
 		User.create_table()
 		Hotel.create_table()
