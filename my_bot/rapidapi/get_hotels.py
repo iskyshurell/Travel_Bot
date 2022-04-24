@@ -24,7 +24,7 @@ def get_massive(url: str, querystring: Dict, headers: Dict, pattern: str = ''):
             print('Не удалось выполнить запрос')
 
 
-def get_photos(r_id: str) -> List:
+def get_photos(r_id: str, n: int) -> List:
 
     response = get_massive(
                             url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos",
@@ -35,10 +35,10 @@ def get_photos(r_id: str) -> List:
     try:
         all_ph = [re.sub(r"{size}", r"z", i['baseUrl']) for i in response.get('hotelImages')]
 
-        if len(all_ph) < 2:
+        if len(all_ph) < n:
 
             return all_ph
-        return all_ph[:2]
+        return all_ph[:n]
 
     except AttributeError:
         print('Ошибка запроса')
@@ -58,14 +58,14 @@ def getter(massive: Dict, args: List[str or int]) -> Union[str, Iterable]:
     return "Error not found"
 
 
-def get_hotels(data: Union[List, Tuple, Dict]) -> List:
+def get_hotels(data: Union[List, Tuple, Dict], n_ph: int = 2) -> List:
 
     return [
         (
             getter(i, ['name']), getter(i, ['address', 'streetAddress']),
             getter(i, ['landmarks', 0, 'distance']),
             getter(i, ['ratePlan', 'price', 'current']),
-            get_photos(getter(i, ['id']))
+            get_photos(getter(i, ['id']), n_ph)
          )
         for i in data['data']['body']['searchResults']["results"]
     ]

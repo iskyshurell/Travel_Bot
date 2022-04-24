@@ -299,6 +299,16 @@ def optional_dist(message: tp.Message, func: str, city: str, n: int):
 
 		bot.register_next_step_handler(message, optional_dist, func, city, n)
 
+# def n_photos(
+# 		message: tp.Message,
+# 		func: str,
+# 		city: str,
+# 		n: int = 0,
+# 		min_: int = 0,
+# 		bd_flag: bool = False
+# 	):
+#
+#
 
 def best_deal_check(
 		message: tp.Message,
@@ -308,11 +318,6 @@ def best_deal_check(
 		min_: int = 0,
 		bd_flag: bool = False
 	):
-
-	bot.send_message(
-		chat_id = message.from_user.id,
-		text = 'Ожидайте! Вскоре мы сможем показать вам ваши отели.'
-	)
 
 	if bd_flag:
 
@@ -385,6 +390,10 @@ def result_check(
 	):
 
 	if result:
+		bot.send_message(
+			chat_id = message.from_user.id,
+			text = 'Ожидайте! Вскоре мы сможем показать вам ваши отели.'
+		)
 
 		result = get_hotel(city)
 
