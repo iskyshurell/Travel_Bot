@@ -58,7 +58,7 @@ def getter(massive: Dict, args: List[str or int]) -> Union[str, Iterable]:
     return "Error not found"
 
 
-def get_hotels(data: Union[List, Tuple, Dict], n_ph: int = 2) -> List:
+def get_hotels(data: Union[List, Tuple, Dict], n_ph: int) -> List:
 
     return [
         (
@@ -101,7 +101,7 @@ def choose_city(temp: Dict) -> Dict:
         raise ValueError('Неправильное содержимое обьекта')
 
 
-def get_hotel(city_id: str) -> List:
+def get_hotel(city_id: str, n_ph: int = 2) -> List:
 
     temp = get_massive(
                     url = "https://hotels4.p.rapidapi.com/properties/list",
@@ -117,7 +117,7 @@ def get_hotel(city_id: str) -> List:
                     pattern = r'(?<=,)"results":.+?(?=,"pagination")'
     )
 
-    return get_hotels(temp)
+    return get_hotels(temp, n_ph)
 
 
 if __name__ == '__main__':  # 1376905

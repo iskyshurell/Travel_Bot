@@ -12,7 +12,11 @@ from itranslate import itranslate
 
 
 @bot.message_handler(commands = ['find-hotels', 'lowprice', 'highprice', 'bestdeal', 'history'])
-def func_choose(message: tp.Message, flag: bool = False, func: str = '') -> None:
+def func_choose(
+		message: tp.Message,
+		flag: bool = False,
+		func: str = ''
+	) -> None:
 
 	if flag:
 		result = func
@@ -72,7 +76,9 @@ def func_choose(message: tp.Message, flag: bool = False, func: str = '') -> None
 		bot.register_next_step_handler(message, func_choose)
 
 
-def history(message: tp.Message) -> None:
+def history(
+		message: tp.Message
+	) -> None:
 
 	with db:
 
@@ -110,7 +116,10 @@ def history(message: tp.Message) -> None:
 			bot.register_next_step_handler(message, next_h)
 
 
-def get_cities(message: tp.Message, func1: str) -> None:
+def get_cities(
+		message: tp.Message,
+		func1: str
+	) -> None:
 
 	result = re.search(r"[ \d]", message.text)
 
@@ -135,7 +144,9 @@ def get_cities(message: tp.Message, func1: str) -> None:
 
 
 @bot.callback_query_handler(func = lambda call: len(call.data.split('-')) == 3)
-def dates(message: tp.CallbackQuery) -> None:
+def dates(
+		message: tp.CallbackQuery
+	) -> None:
 
 	info = str(message.data)
 	info = info.split('-')
@@ -174,7 +185,9 @@ def dates(message: tp.CallbackQuery) -> None:
 
 
 @bot.callback_query_handler(func = DetailedTelegramCalendar.func())
-def cal(message: tp.CallbackQuery) -> None:
+def cal(
+		message: tp.CallbackQuery
+	) -> None:
 
 	result, key, step = DetailedTelegramCalendar().process(message.data)
 
@@ -231,31 +244,32 @@ def cal(message: tp.CallbackQuery) -> None:
 					reply_markup = interface.get_ui('del')
 				)
 
-				if req.func != 'bestdeal':
-
-					bot.register_next_step_handler(message.message, best_deal_check, func, city)
-				else:
-
-					bot.register_next_step_handler(message.message, optional_price, func, city)
+				bot.register_next_step_handler(message.message, n_photos, func, city)
 
 
-def optional_price(message: tp.Message, func: str, city: str) -> None:
+def n_photos(
+		message: tp.Message,
+		func: str,
+		city: str,
+	):
 
 	result = re.search(r'[ \D]', message.text)
 
 	if not result:
-
 		n = int(message.text)
+
 		bot.send_message(
 			chat_id = message.from_user.id,
-			text = 'Введите максимальную стоимость остановки в отеле: '
-		)
-		bot.send_message(
-			chat_id = message.from_user.id,
-			text = '<< Если стоимость не важна, введите 0 >>'
+			text = "Отлично!\nВведите количество фотографий: ",
 		)
 
-		bot.register_next_step_handler(message, optional_dist, func, city, n)
+		if func != 'bestdeal':
+
+			bot.register_next_step_handler(message, best_deal_check, func, city, n)
+		else:
+
+			bot.register_next_step_handler(message, optional_price, func, city, n)
+
 	else:
 
 		bot.send_message(
@@ -267,10 +281,52 @@ def optional_price(message: tp.Message, func: str, city: str) -> None:
 			text = 'Введите новое:'
 		)
 
-		bot.register_next_step_handler(message, optional_price, func, city)
+		bot.register_next_step_handler(message, n_photos, func, city)
 
 
-def optional_dist(message: tp.Message, func: str, city: str, n: int):
+def optional_price(
+		message: tp.Message,
+		func: str,
+		city: str,
+		n: int
+	) -> None:
+
+	result = re.search(r'[ \D]', message.text)
+
+	if not result:
+
+		n_ph = int(message.text)
+		bot.send_message(
+			chat_id = message.from_user.id,
+			text = 'Введите максимальную стоимость остановки в отеле: '
+		)
+		bot.send_message(
+			chat_id = message.from_user.id,
+			text = '<< Если стоимость не важна, введите 0 >>'
+		)
+
+		bot.register_next_step_handler(message, optional_dist, func, city, n, n_ph)
+	else:
+
+		bot.send_message(
+			chat_id = message.from_user.id,
+			text = 'Вы ввели неправильное количество фотографий!'
+		)
+		bot.send_message(
+			chat_id = message.from_user.id,
+			text = 'Введите новое:'
+		)
+
+		bot.register_next_step_handler(message, optional_price, func, city, n)
+
+
+def optional_dist(
+		message: tp.Message,
+		func: str,
+		city: str,
+		n: int,
+		n_ph: int
+	):
 
 	result = re.search(r'[ \D]', message.text)
 	if not result:
@@ -285,7 +341,7 @@ def optional_dist(message: tp.Message, func: str, city: str, n: int):
 			text = '<< Если дистанция не важна, введите 0 >>'
 		)
 
-		bot.register_next_step_handler(message, best_deal_check, func, city, int(n), min_, bd_flag = True)
+		bot.register_next_step_handler(message, best_deal_check, func, city, n, n_ph, min_, bd_flag = True)
 	else:
 
 		bot.send_message(
@@ -297,44 +353,42 @@ def optional_dist(message: tp.Message, func: str, city: str, n: int):
 			text = 'Введите новую стоимость:'
 		)
 
-		bot.register_next_step_handler(message, optional_dist, func, city, n)
+		bot.register_next_step_handler(message, optional_dist, func, city, n, n_ph)
 
-# def n_photos(
-# 		message: tp.Message,
-# 		func: str,
-# 		city: str,
-# 		n: int = 0,
-# 		min_: int = 0,
-# 		bd_flag: bool = False
-# 	):
-#
-#
 
 def best_deal_check(
 		message: tp.Message,
 		func: str,
 		city: str,
 		n: int = 0,
+		n_ph: int = 0,
 		min_: int = 0,
 		bd_flag: bool = False
 	):
 
 	if bd_flag:
 
-		result = re.search(r'[,\d]+', message.text)
+		result = re.search(r'\d+[,.]\d+', message.text)
 
 		if result:
 
 			dist = re.sub(r'[,]', '.', message.text)
 			dist = float(dist)
 
-			result_check(message, result, func, city, n, min_, dist)
+			result_check(message, result, func, city, n, n_ph, min_, dist)
 	else:
 
-		message_check(message, func, city, n, min_)
+		message_check(message, func, city, n, n_ph, min_)
 
 
-def message_check(message: tp.Message, func: str, city: str, n: int = 0, min_: int = 0):
+def message_check(
+		message: tp.Message,
+		func: str,
+		city: str,
+		n: int = 0,
+		n_ph: int = 0,
+		min_: int = 0
+	):
 
 	result = re.search(r'[ \D]', message.text)
 
@@ -342,29 +396,30 @@ def message_check(message: tp.Message, func: str, city: str, n: int = 0, min_: i
 
 		result = True
 
-		n = int(n)
-		if n == 0:
+		n_ph = int(n_ph)
+		if n_ph == 0:
 
-			n = int(message.text)
+			n_ph = int(message.text)
 		else:
 
 			min_ = int(message.text)
 
-		result_check(message, result, func, city, n, min_)
+		result_check(message, result, func, city, n, n_ph, min_)
 	else:
 
-		if n == 0:
+		if n_ph == 0:
 
 			bot.send_message(
 				chat_id = message.from_user.id,
-				text = 'Вы ввели неправильное количество отелей!'
+				text = 'Вы ввели неправильное количество фотографий!'
 			)
 			bot.send_message(
 				chat_id = message.from_user.id,
 				text = 'Введите новое:'
 			)
 
-			bot.register_next_step_handler(message, message_check, func, city)
+			bot.register_next_step_handler(message, message_check, func, city, n, n_ph)
+
 		else:
 
 			bot.send_message(
@@ -376,7 +431,7 @@ def message_check(message: tp.Message, func: str, city: str, n: int = 0, min_: i
 				text = 'Введите новую дистанцию отеля до центра города:'
 			)
 
-			bot.register_next_step_handler(message, message_check, func, city, n)
+			bot.register_next_step_handler(message, message_check, func, city, n, n_ph)
 
 
 def result_check(
@@ -384,7 +439,8 @@ def result_check(
 		result: Union[bool, re.search],
 		func: str,
 		city: str,
-		n: int = 0,
+		n: int = 2,
+		n_ph: int = 2,
 		min_: int = 0,
 		dist: float = 0.0
 	):
@@ -395,7 +451,7 @@ def result_check(
 			text = 'Ожидайте! Вскоре мы сможем показать вам ваши отели.'
 		)
 
-		result = get_hotel(city)
+		result = get_hotel(city, n_ph)
 
 		with db:
 
@@ -406,7 +462,14 @@ def result_check(
 		send_info(message, result, func, n, min_, dist, days)
 
 
-def send_info(message: tp.Message, result: List, func: str, n: int, min_: int, dist: float, days: int):
+def send_info(
+		message: tp.Message,
+		result: List,
+		func: str, n: int,
+		min_: int,
+		dist: float,
+		days: int
+	):
 
 	new_hotels = []
 	u_hotels = sort(result, func, min_, dist)
@@ -468,7 +531,10 @@ def send_info(message: tp.Message, result: List, func: str, n: int, min_: int, d
 		bot.register_next_step_handler(message, next_h)
 
 	
-def save_info(message: tp.Message, new_hotels):
+def save_info(
+		message: tp.Message,
+		new_hotels
+	):
 
 	with db:
 
@@ -495,7 +561,9 @@ def save_info(message: tp.Message, new_hotels):
 	bot.register_next_step_handler(message, next_h)
 
 
-def next_h(message: tp.Message) -> None:
+def next_h(
+		message: tp.Message
+	) -> None:
 
 	if message.text == '/next':
 
