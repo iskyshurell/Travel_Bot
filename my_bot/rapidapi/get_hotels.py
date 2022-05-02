@@ -34,7 +34,6 @@ def get_photos(r_id: str, n: int) -> List:
 
     try:
         all_ph = [re.sub(r"{size}", r"z", i['baseUrl']) for i in response.get('hotelImages')]
-
         if len(all_ph) < n:
 
             return all_ph

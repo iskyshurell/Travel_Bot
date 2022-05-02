@@ -265,7 +265,7 @@ def n_photos(
 
 		if func != 'bestdeal':
 
-			bot.register_next_step_handler(message, best_deal_check, func, city, n)
+			bot.register_next_step_handler(message, message_check, func, city, n)
 		else:
 
 			bot.register_next_step_handler(message, optional_price, func, city, n)
@@ -341,7 +341,7 @@ def optional_dist(
 			text = '<< Если дистанция не важна, введите 0 >>'
 		)
 
-		bot.register_next_step_handler(message, best_deal_check, func, city, n, n_ph, min_, bd_flag = True)
+		bot.register_next_step_handler(message, message_check, func, city, n, n_ph, min_)
 	else:
 
 		bot.send_message(
@@ -356,55 +356,30 @@ def optional_dist(
 		bot.register_next_step_handler(message, optional_dist, func, city, n, n_ph)
 
 
-def best_deal_check(
-		message: tp.Message,
-		func: str,
-		city: str,
-		n: int = 0,
-		n_ph: int = 0,
-		min_: int = 0,
-		bd_flag: bool = False
-	):
-
-	if bd_flag:
-
-		result = re.search(r'\d+[,.]\d+', message.text)
-
-		if result:
-
-			dist = re.sub(r'[,]', '.', message.text)
-			dist = float(dist)
-
-			result_check(message, result, func, city, n, n_ph, min_, dist)
-	else:
-
-		message_check(message, func, city, n, n_ph, min_)
-
-
 def message_check(
 		message: tp.Message,
 		func: str,
 		city: str,
 		n: int = 0,
 		n_ph: int = 0,
-		min_: int = 0
+		min_: int = 0,
+		dist: Union[float, int] = 0.0
 	):
 
-	result = re.search(r'[ \D]', message.text)
+	result = re.search(r'[^,.\d]', message.text)
 
 	if not result:
 
 		result = True
 
-		n_ph = int(n_ph)
-		if n_ph == 0:
+		if int(n_ph) == 0:
 
 			n_ph = int(message.text)
 		else:
 
-			min_ = int(message.text)
+			dist = float(re.sub(r',', '.', message.text))
 
-		result_check(message, result, func, city, n, n_ph, min_)
+		result_check(message, result, func, city, n, n_ph, min_, dist)
 	else:
 
 		if n_ph == 0:
@@ -431,7 +406,7 @@ def message_check(
 				text = 'Введите новую дистанцию отеля до центра города:'
 			)
 
-			bot.register_next_step_handler(message, message_check, func, city, n, n_ph)
+			bot.register_next_step_handler(message, message_check, func, city, n, n_ph, min_)
 
 
 def result_check(
@@ -442,7 +417,7 @@ def result_check(
 		n: int = 2,
 		n_ph: int = 2,
 		min_: int = 0,
-		dist: float = 0.0
+		dist: Union[float, int] = 0.0
 	):
 
 	if result:
