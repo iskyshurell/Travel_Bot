@@ -35,7 +35,7 @@ def sort_lp(example: Iterable) -> Iterable:
 
     Возвращает отсортированный по возрастанию цены массив.
     """
-    temp = [i for i in example if i[3] != 'Error not found']   # такая структура нужна чтобы пользователю
+    temp = [i for i in example if i[3] != 'Error not found']   # такая структура нужна чтобы
 
     temp = sorted(temp, key = lambda x: int(key(x[3], r'[RUB, ]')))   # пользователю не возвращать
     temp.extend([i for i in example if i[3] == 'Error not found'])     # отели без цены как дешёвые
@@ -89,7 +89,7 @@ def sort(example: Iterable, func: str, filt: int = 0, dist: Union[int, float] = 
 
     Возвращает отсортированный массив если все условия соблюдены.
     """
-
+    
     try:
         if func == 'lowprice':
 

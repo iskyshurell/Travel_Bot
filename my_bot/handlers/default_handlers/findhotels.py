@@ -121,7 +121,7 @@ def get_cities(
 		func1: str
 	) -> None:
 
-	result = re.search(r"[ \d]", message.text)
+	result = re.search(r"[\d]", message.text)
 
 	if not result:
 
