@@ -78,3 +78,7 @@ includes:
 ● how far is it from the center,
 ● price,
 ● N photos of the hotel (if the user considered it necessary to display them)
+
+Additional files:
+[readme.md](https://github.com/iskyshurell/Travel_Bot/files/10005691/readme.md) - bot readme
+[requirements.txt](https://github.com/iskyshurell/Travel_Bot/files/10005703/requirements.txt) - requirements
